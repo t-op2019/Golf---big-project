@@ -11,6 +11,7 @@
 		4FC796562807A0A9002E8E77 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FC796532807A0A9002E8E77 /* SDL2_image.framework */; };
 		4FC796572807A0A9002E8E77 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FC796542807A0A9002E8E77 /* SDL2_ttf.framework */; };
 		4FC796582807A0A9002E8E77 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FC796552807A0A9002E8E77 /* SDL2.framework */; };
+		4FC7965E2807A57A002E8E77 /* ball.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC7965D2807A57A002E8E77 /* ball.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,8 @@
 		4FC796532807A0A9002E8E77 /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = ../../../../../../../../Library/Frameworks/SDL2_image.framework; sourceTree = "<group>"; };
 		4FC796542807A0A9002E8E77 /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		4FC796552807A0A9002E8E77 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
+		4FC7965C2807A569002E8E77 /* ball.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ball.h; sourceTree = "<group>"; };
+		4FC7965D2807A57A002E8E77 /* ball.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ball.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +70,8 @@
 		4FC7964A2807A077002E8E77 /* Golf - big project */ = {
 			isa = PBXGroup;
 			children = (
+				4FC7965F2807A842002E8E77 /* headers */,
+				4FC7965B2807A517002E8E77 /* objects */,
 				4FC7965A2807A10E002E8E77 /* assets */,
 				4FC796592807A0FD002E8E77 /* utils */,
 				4FC7964B2807A077002E8E77 /* main.cpp */,
@@ -96,6 +101,22 @@
 			children = (
 			);
 			path = assets;
+			sourceTree = "<group>";
+		};
+		4FC7965B2807A517002E8E77 /* objects */ = {
+			isa = PBXGroup;
+			children = (
+				4FC7965D2807A57A002E8E77 /* ball.cpp */,
+			);
+			path = objects;
+			sourceTree = "<group>";
+		};
+		4FC7965F2807A842002E8E77 /* headers */ = {
+			isa = PBXGroup;
+			children = (
+				4FC7965C2807A569002E8E77 /* ball.h */,
+			);
+			path = headers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -155,6 +176,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FC7965E2807A57A002E8E77 /* ball.cpp in Sources */,
 				4FC7964C2807A077002E8E77 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
