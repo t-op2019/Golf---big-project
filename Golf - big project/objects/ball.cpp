@@ -9,7 +9,7 @@
 
 #include <cmath>
 
-Ball::Ball(Vector _pos, SDL_Texture* _texture, SDL_Texture* _pointArrowTexture, SDL_Texture* _powerMeterForeground, SDL_Texture* _powerMeterBackground, int _index) :Entity(_pos, _texture) {
+Ball::Ball(Vector _pos, SDL_Texture* _texture, SDL_Texture* _pointArrowTexture, SDL_Texture* _powerMeterForeground, SDL_Texture* _powerMeterBackground, int _index) : Entity(_pos, _texture) {
     index = _index;
     points.push_back(Entity(Vector(-64, -64), _pointArrowTexture));
     powerBar.push_back(Entity(Vector(-64, -64), _powerMeterBackground));
@@ -79,7 +79,7 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         setScale(getScale().x - 0.001 * delta, getScale().y - 0.001 * delta);
     }
     
-    // loop through all the holes
+    // loop through all the holes ---------------------------------------------------------------------------
     for (Hole hole : holes) {
         // bias range for the ball to hit the target hole
         if (getPos().x + 4 > hole.getPos().x && getPos().x < hole.getPos().x + 4 && getPos().y + 4 > hole.getPos().y && getPos().y < hole.getPos().y + 4) {
@@ -89,6 +89,7 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         }
     }
     
+    // if mouse is pressed when the ball is stopped, then set the initial position of the mouse
     if (isMousePressed && canMove) {
         int mouseX = 0, mouseY = 0;
         // get the mouse position and set its coordinates onto mouseX and mouseY
@@ -96,6 +97,7 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         setInitialMousePos(mouseX, mouseY);
     }
     
+    // if mouse is dragged when the ball is stopped, calculate velocity and various other elements
     if (isMouseDown && canMove) {
         int mouseX = 0, mouseY = 0;
         // get the mouse position and set its coordinates onto mouseX and mouseY
@@ -133,5 +135,64 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         points.at(0).setPos(-64, -64);
         powerBar.at(0).setPos(-64, -64);
         powerBar.at(0).setPos(-64, -64);
+        canMove = false;
+        // shift the position of the ball towards the direction of the velocity (times delta to move it bit by bit, therefore creating an animation)
+        setPos(getPos().x + getVelocity().x * delta, getPos().y + getVelocity().y * delta);
+        
+        // minimum swing for. if the swing for is less than minimum, then set velocity as 0 and retake the mouse position
+        if (getVelocity().x > 0.0001 || getVelocity().x < -0.0001 || getVelocity().y > 0.0001 || getVelocity().y < -0.0001) {
+            if (velocityValue > 0) {
+                // decrease velocity by a constant friction value
+                velocityValue -= friction * delta;
+            } else {
+                velocityValue = 0;
+            }
+            
+            velocity.x = (velocityValue / lauchedVelocityValue) * abs(lauchedVelocity.x) * directionX;
+            velocity.y = (velocityValue / lauchedVelocityValue) * abs(lauchedVelocity.y) * directionY;
+        } else {
+            setVelocity(0, 0);
+            int mouseX = 0, mouseY = 0;
+            SDL_GetMouseState(&mouseX, &mouseY);
+            setInitialMousePos(mouseX, mouseY);
+            canMove = true;
+        }
+        
+        // boundary check (if the ball hits the boundary, change the direction of the velocity vector) ---------------
+        if (getPos().x + getFrame().w > 800 / (2 - index)) {
+            setVelocity(-abs(getVelocity().x), getVelocity().y);
+            directionX = -1;
+        } else if (getPos().x < 0 + (index * 400)) {
+            setVelocity(abs(getVelocity().x), getVelocity().y);
+            directionX = 1;
+        } else if (getPos().y + getFrame().h > 600) {
+            setVelocity(getVelocity().x, -abs(getVelocity().y));
+            directionY = -1;
+        } else if (getPos().y < 0) {
+            setVelocity(getVelocity().x, abs(getVelocity().y));
+            directionY = 1;
+        }
+        
+        // check for obstacle collision -------------------------------------------------------------------------------
+        for (Tile tile : tiles) {
+            // get the next coordinate for x and y
+            double newCoordinateX = getPos().x + getVelocity().x * delta;
+            double newCoordinateY = getPos().y;
+            
+            // check if coordinate x hits an obstacle, then change the direction of the x vector
+            if (newCoordinateX + 16 > tile.getPos().x && newCoordinateX < tile.getPos().x + tile.getFrame().w) {
+                setVelocity(getVelocity().x * -1, getVelocity().y);
+                directionX *= -1;
+            }
+            
+            newCoordinateX = getPos().x;
+            newCoordinateY = getPos().y + getVelocity().y * delta;
+            
+            // check the same y coordinate as x
+            if (newCoordinateY + 16 > tile.getPos().y && newCoordinateY < tile.getPos().y + tile.getFrame().h - 3) {
+                setVelocity(getVelocity().x, getVelocity().y * -1);
+                directionY *= -1;
+            }
+        }
     }
 }
