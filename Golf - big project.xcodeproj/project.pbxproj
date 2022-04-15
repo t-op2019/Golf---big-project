@@ -7,11 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4FC51B582809905B00F05BDE /* Hole.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC51B562809905B00F05BDE /* Hole.cpp */; };
+		4FC51B5B2809955300F05BDE /* Tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC51B592809955300F05BDE /* Tile.cpp */; };
 		4FC7964C2807A077002E8E77 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC7964B2807A077002E8E77 /* main.cpp */; };
 		4FC796562807A0A9002E8E77 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FC796532807A0A9002E8E77 /* SDL2_image.framework */; };
 		4FC796572807A0A9002E8E77 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FC796542807A0A9002E8E77 /* SDL2_ttf.framework */; };
 		4FC796582807A0A9002E8E77 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FC796552807A0A9002E8E77 /* SDL2.framework */; };
-		4FC7965E2807A57A002E8E77 /* ball.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC7965D2807A57A002E8E77 /* ball.cpp */; };
+		4FC796622807BCEA002E8E77 /* SDL_Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC796602807BCEA002E8E77 /* SDL_Utils.cpp */; };
+		4FC796672807C172002E8E77 /* game_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC796652807C172002E8E77 /* game_functions.cpp */; };
+		4FC7966B2807C59B002E8E77 /* background_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC796692807C59B002E8E77 /* background_functions.cpp */; };
+		4FC796702807E414002E8E77 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC7966E2807E414002E8E77 /* Entity.cpp */; };
+		4FC7967628084892002E8E77 /* Ball.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC7967428084892002E8E77 /* Ball.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,13 +33,25 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4FC51B562809905B00F05BDE /* Hole.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Hole.cpp; sourceTree = "<group>"; };
+		4FC51B572809905B00F05BDE /* Hole.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Hole.hpp; sourceTree = "<group>"; };
+		4FC51B592809955300F05BDE /* Tile.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tile.cpp; sourceTree = "<group>"; };
+		4FC51B5A2809955300F05BDE /* Tile.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Tile.hpp; sourceTree = "<group>"; };
 		4FC796482807A077002E8E77 /* Golf - big project */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Golf - big project"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FC7964B2807A077002E8E77 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4FC796532807A0A9002E8E77 /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = ../../../../../../../../Library/Frameworks/SDL2_image.framework; sourceTree = "<group>"; };
 		4FC796542807A0A9002E8E77 /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		4FC796552807A0A9002E8E77 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
-		4FC7965C2807A569002E8E77 /* ball.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ball.h; sourceTree = "<group>"; };
-		4FC7965D2807A57A002E8E77 /* ball.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ball.cpp; sourceTree = "<group>"; };
+		4FC796602807BCEA002E8E77 /* SDL_Utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SDL_Utils.cpp; sourceTree = "<group>"; };
+		4FC796612807BCEA002E8E77 /* SDL_Utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SDL_Utils.hpp; sourceTree = "<group>"; };
+		4FC796652807C172002E8E77 /* game_functions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = game_functions.cpp; sourceTree = "<group>"; };
+		4FC796662807C172002E8E77 /* game_functions.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = game_functions.hpp; sourceTree = "<group>"; };
+		4FC796692807C59B002E8E77 /* background_functions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = background_functions.cpp; sourceTree = "<group>"; };
+		4FC7966A2807C59B002E8E77 /* background_functions.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = background_functions.hpp; sourceTree = "<group>"; };
+		4FC7966E2807E414002E8E77 /* Entity.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Entity.cpp; sourceTree = "<group>"; };
+		4FC7966F2807E414002E8E77 /* Entity.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Entity.hpp; sourceTree = "<group>"; };
+		4FC7967428084892002E8E77 /* Ball.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Ball.cpp; sourceTree = "<group>"; };
+		4FC7967528084892002E8E77 /* Ball.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Ball.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +88,7 @@
 		4FC7964A2807A077002E8E77 /* Golf - big project */ = {
 			isa = PBXGroup;
 			children = (
+				4FC796632807C126002E8E77 /* src */,
 				4FC7965F2807A842002E8E77 /* headers */,
 				4FC7965B2807A517002E8E77 /* objects */,
 				4FC7965A2807A10E002E8E77 /* assets */,
@@ -92,6 +111,8 @@
 		4FC796592807A0FD002E8E77 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				4FC796602807BCEA002E8E77 /* SDL_Utils.cpp */,
+				4FC796692807C59B002E8E77 /* background_functions.cpp */,
 			);
 			path = utils;
 			sourceTree = "<group>";
@@ -99,6 +120,8 @@
 		4FC7965A2807A10E002E8E77 /* assets */ = {
 			isa = PBXGroup;
 			children = (
+				4FC7966D2807DF01002E8E77 /* fonts */,
+				4FC7966C2807DEF2002E8E77 /* images */,
 			);
 			path = assets;
 			sourceTree = "<group>";
@@ -106,7 +129,10 @@
 		4FC7965B2807A517002E8E77 /* objects */ = {
 			isa = PBXGroup;
 			children = (
-				4FC7965D2807A57A002E8E77 /* ball.cpp */,
+				4FC7966E2807E414002E8E77 /* Entity.cpp */,
+				4FC7967428084892002E8E77 /* Ball.cpp */,
+				4FC51B562809905B00F05BDE /* Hole.cpp */,
+				4FC51B592809955300F05BDE /* Tile.cpp */,
 			);
 			path = objects;
 			sourceTree = "<group>";
@@ -114,9 +140,37 @@
 		4FC7965F2807A842002E8E77 /* headers */ = {
 			isa = PBXGroup;
 			children = (
-				4FC7965C2807A569002E8E77 /* ball.h */,
+				4FC51B5A2809955300F05BDE /* Tile.hpp */,
+				4FC51B572809905B00F05BDE /* Hole.hpp */,
+				4FC7967528084892002E8E77 /* Ball.hpp */,
+				4FC7966F2807E414002E8E77 /* Entity.hpp */,
+				4FC7966A2807C59B002E8E77 /* background_functions.hpp */,
+				4FC796662807C172002E8E77 /* game_functions.hpp */,
+				4FC796612807BCEA002E8E77 /* SDL_Utils.hpp */,
 			);
 			path = headers;
+			sourceTree = "<group>";
+		};
+		4FC796632807C126002E8E77 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				4FC796652807C172002E8E77 /* game_functions.cpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		4FC7966C2807DEF2002E8E77 /* images */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
+		4FC7966D2807DF01002E8E77 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -176,8 +230,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FC7965E2807A57A002E8E77 /* ball.cpp in Sources */,
+				4FC7967628084892002E8E77 /* Ball.cpp in Sources */,
+				4FC796672807C172002E8E77 /* game_functions.cpp in Sources */,
 				4FC7964C2807A077002E8E77 /* main.cpp in Sources */,
+				4FC51B582809905B00F05BDE /* Hole.cpp in Sources */,
+				4FC796622807BCEA002E8E77 /* SDL_Utils.cpp in Sources */,
+				4FC796702807E414002E8E77 /* Entity.cpp in Sources */,
+				4FC7966B2807C59B002E8E77 /* background_functions.cpp in Sources */,
+				4FC51B5B2809955300F05BDE /* Tile.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
