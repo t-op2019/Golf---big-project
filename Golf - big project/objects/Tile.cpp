@@ -7,6 +7,4 @@
 
 #include "Tile.hpp"
 
-Tile::Tile(Vector _pos, SDL_Texture* _texture) : Entity(_pos, _texture) {
-    cout << "Tile set" << endl;
-}
+Tile::Tile(Vector _pos, SDL_Texture* _texture) : Entity(_pos, _texture) {}

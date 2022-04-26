@@ -9,6 +9,9 @@
 
 #include <iostream>
 #include <SDL2/SDL.h>
+#include "background_functions.hpp"
+#include "Entity.hpp"
+#include "Tile.hpp"
 
 using namespace std;
 

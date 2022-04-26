@@ -19,6 +19,10 @@ SDL_Texture* Entity::getTexture() {
     return texture;
 }
 
+double Entity::getAngle() {
+    return angle;
+}
+
 Vector Entity::getPos() {
     return pos;
 }

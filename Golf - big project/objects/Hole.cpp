@@ -7,6 +7,4 @@
 
 #include "Hole.hpp"
 
-Hole::Hole(Vector _pos, SDL_Texture* _texture) : Entity(_pos, _texture) {
-    cout << "Hole set" << endl;
-}
+Hole::Hole(Vector _pos, SDL_Texture* _texture) : Entity(_pos, _texture) {}
