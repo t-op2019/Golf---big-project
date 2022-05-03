@@ -10,9 +10,11 @@
 #include "SDL_Utils.hpp"
 #include "Entity.hpp"
 #include "Tile.hpp"
+#include "Spike.hpp"
 #include "Ball.hpp"
 #include "Hole.hpp"
 #include <iostream>
+#include <algorithm>
 #include <vector>
 using namespace std;
 
@@ -32,6 +34,12 @@ void renderBackground();
 
 void renderObject(Entity& entity);
 
+void renderObject(Entity& entity, SDL_Texture* customTexture);
+
 vector<Tile> loadTiles(int lvl);
+
+vector<Tile> loadSpikes(int lvl);
+
+vector<Spike> loadIntervalSpikes(int lvl);
 
 void loadLevels(int lvl);

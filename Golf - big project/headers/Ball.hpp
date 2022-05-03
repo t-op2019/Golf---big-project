@@ -15,6 +15,7 @@
 #include "Entity.hpp"
 #include "Hole.hpp"
 #include "Tile.hpp"
+#include "Spike.hpp"
 
 using namespace std;
 
@@ -29,13 +30,14 @@ public:
     int getStroke();
     bool hasWon();
     
-    void increaseStroke();
+    void setStroke(int _stroke);
     void setWin(bool _win);
     void setInitialMousePos(double x, double y);
     void setVelocity(double x, double y);
     void setArrowVelocity(double x, double y);
     void setLauchVelocity(double x, double y);
-    void update(double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, Hole hole);
+    void update(double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, Hole hole, int &_gameState);
+    void reset();
     
 private:
     Vector velocity;

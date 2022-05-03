@@ -14,6 +14,8 @@
 
 class Tile : public Entity {
 public:
-    Tile(Vector _pos, SDL_Texture* _texture);
+    Tile(Vector _pos, SDL_Texture* _texture, bool _isSpike, bool _isCracked);
+    bool isSpike;
+    bool isCracked;
 };
 

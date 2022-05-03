@@ -19,6 +19,10 @@ SDL_Texture* Entity::getTexture() {
     return texture;
 }
 
+void Entity::setTexture(SDL_Texture* _texture) {
+    texture = _texture;
+}
+
 double Entity::getAngle() {
     return angle;
 }

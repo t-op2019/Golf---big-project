@@ -40,6 +40,7 @@ public:
     double getAngle();
     void setAngle(double angle);
     SDL_Texture* getTexture();
+    void setTexture(SDL_Texture* _texture);
     void update(double delta);
     SDL_Rect getFrame();
     

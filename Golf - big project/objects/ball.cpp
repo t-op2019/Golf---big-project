@@ -28,8 +28,8 @@ int Ball::getStroke() {
     return stroke;
 }
 
-void Ball::increaseStroke() {
-    stroke++;
+void Ball::setStroke(int _stroke) {
+    stroke = _stroke;
 }
 
 Vector Ball::getVelocity() {
@@ -72,9 +72,16 @@ void Ball::setWin(bool _win) {
     win = _win;
 }
 
+// reset all of the ball's parameter to its original state
+void Ball::reset() {
+    setVelocity(0, 0);
+    setArrowVelocity(0, 0);
+    setWin(false);
+    setStroke(0);
+}
 
 // function for updating the ball positions when swung, hit walls and hit goals
-void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, Hole hole) {
+void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, Hole hole, int &_gameState) {
     if (win) {
         // shifts the position of ball to the center of hole's position by 0.1 * delta if the ball's texture is in the hole's texture
         if (getPos().x < target.x) {
@@ -134,10 +141,15 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         
         // check if coordinate x hits an obstacle, then change the direction of the x vector
         if (hitTile) {
-            bounce++;
-            setVelocity(getVelocity().x * -1, getVelocity().y);
-            setArrowVelocity(getArrowVelocity().x * -1, getArrowVelocity().y);
-            directionX *= -1;
+            if (tile.isSpike) {
+                reset();
+                _gameState = 3;
+            } else {
+                bounce++;
+                setVelocity(getVelocity().x * -1, getVelocity().y);
+                setArrowVelocity(getArrowVelocity().x * -1, getArrowVelocity().y);
+                directionX *= -1;
+            }
         }
         
         newCoordinateX = getPos().x;
@@ -145,10 +157,25 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         
         // check the same y coordinate as x
         if (hitTile) {
-            bounce++;
-            setVelocity(getVelocity().x, getVelocity().y * -1);
-            setArrowVelocity(getArrowVelocity().x, getArrowVelocity().y * -1);
-            directionY *= -1;
+            if (tile.isSpike) {
+                reset();
+                _gameState = 3;
+            } else {
+                bounce++;
+                setVelocity(getVelocity().x, getVelocity().y * -1);
+                setArrowVelocity(getArrowVelocity().x, getArrowVelocity().y * -1);
+                directionY *= -1;
+            }
+        }
+    }
+    
+    // check if ball is running through active spikes
+    for (Spike spike : spikes) {
+        if (spike.getOpen()) {
+            if (getPos().x + 8 > spike.getPos().x && getPos().x < spike.getPos().x + 8 && getPos().y + 8 > spike.getPos().y && getPos().y < spike.getPos().y + 8) {
+                reset();
+                _gameState = 3;
+            }
         }
     }
     
@@ -168,7 +195,7 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         // get the mouse position and set its coordinates onto mouseX and mouseY
         SDL_GetMouseState(&mouseX, &mouseY);
         // change the value of powerConstant to change the velocity limit (the smaller the powerConstant, the harder the player can swing)
-        const int powerConstant = 75;
+        const int powerConstant = 50;
         // calculate velocity using the current and initial mouse potitions
         setArrowVelocity((mouseX - getInitialMousePos().x) / -powerConstant, (mouseY - getInitialMousePos().y) / -powerConstant);
 //        setVelocity((mouseX - getInitialMousePos().x) / -powerConstant, (mouseY - getInitialMousePos().y) / -powerConstant);
@@ -209,7 +236,7 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
 //        cout << "pos x " << getVelocity().x << endl << "pos y " << getVelocity().y << endl << endl;
         
         // minimum velocity. if the velocity is less than minimum, then set velocity as 0 and retake the mouse position
-        if (getVelocity().x > 0.0001 || getVelocity().x < -0.0001 || getVelocity().y > 0.0001 || getVelocity().y < -0.0001) {
+        if (getVelocity().x > 0.00001 || getVelocity().x < -0.00001 || getVelocity().y > 0.00001 || getVelocity().y < -0.00001) {
             if (velocityValue > 0) {
                 // decrease velocity by a constant friction value
                 velocityValue -= friction * delta;

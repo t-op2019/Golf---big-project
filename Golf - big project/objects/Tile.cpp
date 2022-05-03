@@ -7,4 +7,7 @@
 
 #include "Tile.hpp"
 
-Tile::Tile(Vector _pos, SDL_Texture* _texture) : Entity(_pos, _texture) {}
+Tile::Tile(Vector _pos, SDL_Texture* _texture, bool _isSpike, bool _isCracked) : Entity(_pos, _texture) {
+    isSpike = _isSpike;
+    isCracked = _isCracked;
+}

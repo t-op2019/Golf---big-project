@@ -18,6 +18,7 @@
 		4FC7966B2807C59B002E8E77 /* background_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC796692807C59B002E8E77 /* background_functions.cpp */; };
 		4FC796702807E414002E8E77 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC7966E2807E414002E8E77 /* Entity.cpp */; };
 		4FC7967628084892002E8E77 /* Ball.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC7967428084892002E8E77 /* Ball.cpp */; };
+		4FE21AAA281A1F4A0057EAE2 /* Spike.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FE21AA8281A1F4A0057EAE2 /* Spike.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -52,6 +53,8 @@
 		4FC7966F2807E414002E8E77 /* Entity.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Entity.hpp; sourceTree = "<group>"; };
 		4FC7967428084892002E8E77 /* Ball.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Ball.cpp; sourceTree = "<group>"; };
 		4FC7967528084892002E8E77 /* Ball.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Ball.hpp; sourceTree = "<group>"; };
+		4FE21AA8281A1F4A0057EAE2 /* Spike.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Spike.cpp; sourceTree = "<group>"; };
+		4FE21AA9281A1F4A0057EAE2 /* Spike.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Spike.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +136,7 @@
 				4FC7967428084892002E8E77 /* Ball.cpp */,
 				4FC51B562809905B00F05BDE /* Hole.cpp */,
 				4FC51B592809955300F05BDE /* Tile.cpp */,
+				4FE21AA8281A1F4A0057EAE2 /* Spike.cpp */,
 			);
 			path = objects;
 			sourceTree = "<group>";
@@ -140,6 +144,7 @@
 		4FC7965F2807A842002E8E77 /* headers */ = {
 			isa = PBXGroup;
 			children = (
+				4FE21AA9281A1F4A0057EAE2 /* Spike.hpp */,
 				4FC51B5A2809955300F05BDE /* Tile.hpp */,
 				4FC51B572809905B00F05BDE /* Hole.hpp */,
 				4FC7967528084892002E8E77 /* Ball.hpp */,
@@ -238,6 +243,7 @@
 				4FC796702807E414002E8E77 /* Entity.cpp in Sources */,
 				4FC7966B2807C59B002E8E77 /* background_functions.cpp in Sources */,
 				4FC51B5B2809955300F05BDE /* Tile.cpp in Sources */,
+				4FE21AAA281A1F4A0057EAE2 /* Spike.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
