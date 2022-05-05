@@ -28,6 +28,10 @@ int Ball::getStroke() {
     return stroke;
 }
 
+int Ball::getBounce() {
+    return bounce;
+}
+
 void Ball::setStroke(int _stroke) {
     stroke = _stroke;
 }
@@ -72,6 +76,17 @@ void Ball::setWin(bool _win) {
     win = _win;
 }
 
+void Ball::setSwung(bool _swung) {
+    swung = _swung;
+}
+
+// reset swung to false after 100 for loops (timeout)
+void Ball::resetSwung(int counter) {
+    if (counter % 20 == 0) {
+        swung = false;
+    }
+}
+
 // reset all of the ball's parameter to its original state
 void Ball::reset() {
     setVelocity(0, 0);
@@ -80,8 +95,33 @@ void Ball::reset() {
     setStroke(0);
 }
 
+void Ball::setLines(vector<SDL_Point> points) {
+    setNumOfLines((int)points.size());
+//    cout << numOfLines << endl;
+//    cout << "start: " << points[0].x << " - " << points[0].y << endl;
+//    cout << "end: " << points[1].x << " - " << points[1].y << endl;
+    for (int i = 0; i < points.size(); i++) {
+//        cout << points[i].x << " " << points[i].y << endl;
+        lines[i] = points[i];
+//        cout << i + 1 << ". " << lines[i].x << " " << lines[i].y << endl;
+    }
+}
+
+SDL_Point* Ball::getLines() {
+    return lines;
+}
+
+void Ball::setNumOfLines(int num) {
+    numOfLines = num;
+}
+
+int Ball::getNumOfLines() {
+    return numOfLines;
+}
+
 // function for updating the ball positions when swung, hit walls and hit goals
-void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, Hole hole, int &_gameState) {
+void Ball::update(SDL_Renderer* renderer, double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, Hole hole, int &_gameState) {
+//    cout << swung << endl;
     if (win) {
         // shifts the position of ball to the center of hole's position by 0.1 * delta if the ball's texture is in the hole's texture
         if (getPos().x < target.x) {
@@ -95,6 +135,9 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
             setPos(getPos().x, getPos().y - 1.5 * delta);
         }
         
+        setVelocity(velocity.x - 0.05 * delta, velocity.y - 0.05 * delta);
+        setArrowVelocity(arrowVelocity.x - 0.05 * delta, arrowVelocity.y - 0.05 * delta);
+        
         // decrease the size the of ball gradually as it enters the hole
         setScale(getScale().x - 0.05 * delta, getScale().y - 0.05 * delta);
     }
@@ -105,78 +148,6 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         setWin(true);
         target.x = hole.getPos().x;
         target.y = hole.getPos().y + 8;
-    }
-    
-    // boundary check (if the ball hits the boundary, change the direction of the velocity vector) ---------------
-    if (getPos().x + getFrame().w > 800) {
-        bounce++;
-        setVelocity(-abs(getVelocity().x), getVelocity().y);
-        setArrowVelocity(-abs(getArrowVelocity().x), getArrowVelocity().y);
-        directionX = -1;
-    } else if (getPos().x < 0) {
-        bounce++;
-        cout << directionX << endl;
-        setVelocity(abs(getVelocity().x), getVelocity().y);
-        setArrowVelocity(abs(getArrowVelocity().x), getArrowVelocity().y);
-        directionX = 1;
-    } else if (getPos().y + getFrame().h > 600) {
-        bounce++;
-        setVelocity(getVelocity().x, -abs(getVelocity().y));
-        setArrowVelocity(getArrowVelocity().x, -abs(getArrowVelocity().y));
-        directionY = -1;
-    } else if (getPos().y < 0) {
-        bounce++;
-        setVelocity(getVelocity().x, abs(getVelocity().y));
-        setArrowVelocity(getArrowVelocity().x, abs(getArrowVelocity().y));
-        directionY = 1;
-    }
-    
-    // check for obstacle collision -------------------------------------------------------------------------------
-    for (Tile& tile : tiles) {
-        // get the next coordinate for x and y
-        double newCoordinateX = getPos().x + getVelocity().x * delta;
-        double newCoordinateY = getPos().y;
-        
-        bool hitTile = (newCoordinateX + 16 > tile.getPos().x && newCoordinateX < tile.getPos().x + tile.getFrame().w) && (newCoordinateY + 16 > tile.getPos().y && newCoordinateY < tile.getPos().y + tile.getFrame().h - 3);
-        
-        // check if coordinate x hits an obstacle, then change the direction of the x vector
-        if (hitTile) {
-            if (tile.isSpike) {
-                reset();
-                _gameState = 3;
-            } else {
-                bounce++;
-                setVelocity(getVelocity().x * -1, getVelocity().y);
-                setArrowVelocity(getArrowVelocity().x * -1, getArrowVelocity().y);
-                directionX *= -1;
-            }
-        }
-        
-        newCoordinateX = getPos().x;
-        newCoordinateY = getPos().y + getVelocity().y * delta;
-        
-        // check the same y coordinate as x
-        if (hitTile) {
-            if (tile.isSpike) {
-                reset();
-                _gameState = 3;
-            } else {
-                bounce++;
-                setVelocity(getVelocity().x, getVelocity().y * -1);
-                setArrowVelocity(getArrowVelocity().x, getArrowVelocity().y * -1);
-                directionY *= -1;
-            }
-        }
-    }
-    
-    // check if ball is running through active spikes
-    for (Spike spike : spikes) {
-        if (spike.getOpen()) {
-            if (getPos().x + 8 > spike.getPos().x && getPos().x < spike.getPos().x + 8 && getPos().y + 8 > spike.getPos().y && getPos().y < spike.getPos().y + 8) {
-                reset();
-                _gameState = 3;
-            }
-        }
     }
     
     // if mouse is pressed when the ball is stopped, then set the initial position of the mouse
@@ -216,6 +187,11 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         powerBar.at(0).setPos(getPos().x + 40, getPos().y - 32);
         powerBar.at(1).setPos(getPos().x + 44, getPos().y + 4 - 32 * powerBar.at(1).getScale().y);
         
+        // draw path prediction line
+        Vector startPos = Vector(getPos().x + 8, getPos().y + 8);
+        vector<SDL_Point> points = updateLine(tiles, arrowVelocity, startPos);
+        setLines(points);
+        
         // if the player's swing power exceeds the limit, set the velocity value to be 1 (at limit)
         if (velocityValue > 1) {
             velocityValue = 1;
@@ -226,17 +202,18 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
         powerBar.at(1).setScale(1, velocityValue / 1);
         setPos(getPos().x + getVelocity().x * delta * 0.25, getPos().y + getVelocity().y * delta * 0.25);
     } else {
+        setNumOfLines(0);
         setVelocity(getArrowVelocity().x, getArrowVelocity().y);
         points.at(0).setPos(-64, -64);
         powerBar.at(0).setPos(-64, -64);
-        powerBar.at(0).setPos(-64, -64);
+        powerBar.at(1).setPos(-64, -64);
         canMove = false;
         // shift the position of the ball towards the direction of the velocity (times delta to move it bit by bit, therefore creating an animation)
         setPos(getPos().x + getVelocity().x * delta, getPos().y + getVelocity().y * delta);
 //        cout << "pos x " << getVelocity().x << endl << "pos y " << getVelocity().y << endl << endl;
         
         // minimum velocity. if the velocity is less than minimum, then set velocity as 0 and retake the mouse position
-        if (getVelocity().x > 0.00001 || getVelocity().x < -0.00001 || getVelocity().y > 0.00001 || getVelocity().y < -0.00001) {
+        if (getVelocity().x > 0.0001 || getVelocity().x < -0.0001 || getVelocity().y > 0.0001 || getVelocity().y < -0.0001) {
             if (velocityValue > 0) {
                 // decrease velocity by a constant friction value
                 velocityValue -= friction * delta;
@@ -252,6 +229,118 @@ void Ball::update(double delta, bool isMouseDown, bool isMousePressed, vector<Ti
             SDL_GetMouseState(&mouseX, &mouseY);
             setInitialMousePos(mouseX, mouseY);
             canMove = true;
+        }
+    }
+    
+    // boundary check (if the ball hits the boundary, change the direction of the velocity vector) ---------------
+    if (getPos().x + getFrame().w > 800) {
+        bounce++;
+        setVelocity(-abs(getVelocity().x), getVelocity().y);
+        setArrowVelocity(-abs(getArrowVelocity().x), getArrowVelocity().y);
+        directionX = -1;
+    } else if (getPos().x < 0) {
+        bounce++;
+//        cout << directionX << endl;
+        setVelocity(abs(getVelocity().x), getVelocity().y);
+        setArrowVelocity(abs(getArrowVelocity().x), getArrowVelocity().y);
+        directionX = 1;
+    } else if (getPos().y + getFrame().h > 600) {
+        bounce++;
+        setVelocity(getVelocity().x, -abs(getVelocity().y));
+        setArrowVelocity(getArrowVelocity().x, -abs(getArrowVelocity().y));
+        directionY = -1;
+    } else if (getPos().y < 0) {
+        bounce++;
+        setVelocity(getVelocity().x, abs(getVelocity().y));
+        setArrowVelocity(getArrowVelocity().x, abs(getArrowVelocity().y));
+        directionY = 1;
+    }
+    
+    // check for obstacle collision -------------------------------------------------------------------------------
+    for (Tile& tile : tiles) {
+        // get the next coordinate for x and y
+        double newCoordinateX = getPos().x + getVelocity().x * delta * 1.2;
+        double newCoordinateY = getPos().y + getVelocity().y * delta * 1.2;
+        
+        SDL_Point newPointTopLeft = {(int)newCoordinateX, (int)newCoordinateY};
+        SDL_Point newPointBottomRight = {(int)(newCoordinateX + 16), (int)(newCoordinateY + 16)};
+        
+        if (SDL_PointInRect(&newPointTopLeft, tile.getRect()) || SDL_PointInRect(&newPointBottomRight, tile.getRect())) {
+            // check if the ball hit the horizontal edge of the wall
+            if (newCoordinateX >= tile.getPos().x && newCoordinateX + 16 <= tile.getPos().x + tile.getFrame().w) {
+                // if the wall is spiked, then reset the level
+                if (tile.getIsSpike()) {
+                    reset();
+                    _gameState = 3;
+                } else if (tile.getIsSticky() && !swung) {
+                    // if the wall is sticky, then decrease all velocity
+                    setVelocity(0, 0);
+                    setArrowVelocity(0, 0);
+                } else {
+                    bounce++;
+                    setVelocity(getVelocity().x, getVelocity().y * -1);
+                    setArrowVelocity(getArrowVelocity().x, getArrowVelocity().y * -1);
+                    directionY *= -1;
+                }
+            }
+            // check if the ball hit the vertical edge of the wall
+            else if (newCoordinateY >= tile.getPos().y && newCoordinateY + 16 <= tile.getPos().y + tile.getFrame().h - 3) {
+                if (tile.getIsSpike()) {
+                    reset();
+                    _gameState = 3;
+                } else if (tile.getIsSticky() && !swung) {
+                    setVelocity(0, 0);
+                    setArrowVelocity(0, 0);
+                } else {
+                    bounce++;
+                    setVelocity(getVelocity().x * -1, getVelocity().y);
+                    setArrowVelocity(getArrowVelocity().x * -1, getArrowVelocity().y);
+                    directionX *= -1;
+                }
+            }
+        }
+        
+//        bool hitTile = (newCoordinateX + 16 > tile.getPos().x && newCoordinateX < tile.getPos().x + tile.getFrame().w) && (newCoordinateY + 16 > tile.getPos().y && newCoordinateY < tile.getPos().y + tile.getFrame().h - 3);
+//
+//        // check if coordinate x hits an obstacle, then change the direction of the x vector
+//        if (hitTile) {
+//            // if the wall is a spiked wall then reset the gamestate
+//            if (tile.isSpike) {
+//                reset();
+//                _gameState = 3;
+//            } else {
+//                bounce++;
+//                setVelocity(getVelocity().x * -1, getVelocity().y);
+//                setArrowVelocity(getArrowVelocity().x * -1, getArrowVelocity().y);
+//                directionX *= -1;
+//            }
+//        }
+//
+//        newCoordinateX = getPos().x;
+//        newCoordinateY = getPos().y + getVelocity().y * delta;
+//
+//        // check the same y coordinate as x
+//        if (hitTile) {
+//            // if the wall is a spiked wall then reset the gamestate
+//            if (tile.isSpike) {
+//                reset();
+//                _gameState = 3;
+//            } else {
+//                bounce++;
+//                setVelocity(getVelocity().x, getVelocity().y * -1);
+//                setArrowVelocity(getArrowVelocity().x, getArrowVelocity().y * -1);
+//                directionY *= -1;
+//            }
+//        }
+    }
+    
+    // check if ball is running through active spikes
+    for (Spike spike : spikes) {
+        if (spike.getOpen()) {
+            if (getPos().x + 8 > spike.getPos().x && getPos().x < spike.getPos().x + 8 && getPos().y + 8 > spike.getPos().y && getPos().y < spike.getPos().y + 8) {
+                reset();
+                _gameState = 3;
+            }
         }
     }
 }

@@ -32,7 +32,8 @@ int main(int argc, const char * argv[]) {
     setVariables(window, renderer, windowTitle, width, height, lvl, gameState);
     SDL_Event event;
     loadAllTexture();
-    loadLevels(lvl);
+//    loadLevels(lvl);
+    refresh();
     while (SDL_PollEvent(&event) || isPlaying) {
         playGame(gameState, event);
     }

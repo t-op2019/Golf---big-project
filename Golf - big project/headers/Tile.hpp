@@ -15,7 +15,14 @@
 class Tile : public Entity {
 public:
     Tile(Vector _pos, SDL_Texture* _texture, bool _isSpike, bool _isCracked);
+    SDL_Rect* getRect();
+    bool getIsSpike();
+    void setIsSpike(bool _isSpike);
+    bool getIsSticky();
+    void setIsSticky(bool _isSticky);
+private:
     bool isSpike;
-    bool isCracked;
+    bool isSticky;
+    SDL_Rect rect;
 };
 
