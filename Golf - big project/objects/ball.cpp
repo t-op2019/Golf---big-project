@@ -36,6 +36,10 @@ void Ball::setStroke(int _stroke) {
     stroke = _stroke;
 }
 
+void Ball::setBounce(int _bounce) {
+    bounce = _bounce;
+}
+
 Vector Ball::getVelocity() {
     return velocity;
 }
@@ -93,6 +97,9 @@ void Ball::reset() {
     setArrowVelocity(0, 0);
     setWin(false);
     setStroke(0);
+    setBounce(0);
+    velocityValue = 0;
+    lauchedVelocityValue = 0;
 }
 
 void Ball::setLines(vector<SDL_Point> points) {
@@ -276,6 +283,8 @@ void Ball::update(SDL_Renderer* renderer, double delta, bool isMouseDown, bool i
                     // if the wall is sticky, then decrease all velocity
                     setVelocity(0, 0);
                     setArrowVelocity(0, 0);
+                    velocityValue = 0;
+                    lauchedVelocityValue = 0;
                 } else {
                     bounce++;
                     setVelocity(getVelocity().x, getVelocity().y * -1);
@@ -291,6 +300,8 @@ void Ball::update(SDL_Renderer* renderer, double delta, bool isMouseDown, bool i
                 } else if (tile.getIsSticky() && !swung) {
                     setVelocity(0, 0);
                     setArrowVelocity(0, 0);
+                    velocityValue = 0;
+                    lauchedVelocityValue = 0;
                 } else {
                     bounce++;
                     setVelocity(getVelocity().x * -1, getVelocity().y);
