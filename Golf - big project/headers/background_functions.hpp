@@ -10,6 +10,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <string>
 
 #include "SDL_Utils.hpp"
 #include "level_loader.hpp"
@@ -46,3 +47,7 @@ vector<Tile> loadSpikes(int lvl);
 vector<Spike> loadIntervalSpikes(int lvl);
 
 void loadLevels(int lvl);
+
+void renderLevelText(int lvl);
+
+void renderRequirements(int _currentStrokes, int _currentBounces);

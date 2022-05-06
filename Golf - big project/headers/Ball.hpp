@@ -36,6 +36,7 @@ public:
     void resetSwung(int counter);
     
     void setStroke(int _stroke);
+    void setBounce(int _bounce);
     void setWin(bool _win);
     void setInitialMousePos(double x, double y);
     void setVelocity(double x, double y);

@@ -140,7 +140,7 @@ void renderText(int fontSize, const char* input, SDL_Renderer* renderer, int x, 
     // font color
     SDL_Color white = {255, 255, 255};
     TTF_Font* Bridge;
-    Bridge = TTF_OpenFont("assets/fonts/BRIDGE.TTF", fontSize);
+    Bridge = TTF_OpenFont("assets/fonts/font.ttf", fontSize);
     
     // text surface
     SDL_Surface* textSurface = TTF_RenderText_Solid(Bridge, input, white);

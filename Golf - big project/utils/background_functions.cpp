@@ -207,6 +207,12 @@ void refresh() {
         renderObject(tile);
     }
     
+    // render level text
+    renderLevelText(lvl);
+    
+    // render requirements text
+    renderRequirements(ball.getStroke(), ball.getBounce());
+    
     // render ball
     //    for (Ball ball : balls) {
     if (!ball.hasWon()) {
@@ -292,7 +298,26 @@ void renderArrow(Entity& entity) {
     SDL_RenderCopyEx(renderer, entity.getTexture(), NULL, &destination, entity.getAngle(), 0, SDL_FLIP_NONE);
 }
 
+void renderLevelText(int lvl) {
+    string level = to_string(lvl);
+    string stringTxt = "LEVEL " + level;
+    
+    const char* text = stringTxt.c_str();
+    renderText(32, text, renderer, width / 2 - 50, 50);
+}
 
+void renderRequirements(int _currentStrokes, int _currentBounces) {
+    string strokes = to_string((int)requirements.x);
+    string currentStrokes = to_string(_currentStrokes);
+    string bounces = to_string((int)requirements.y);
+    string currentBounces = to_string(_currentBounces);
+    
+    string stringTxt = "Strokes: " + currentStrokes + " / " + strokes + "   Bounces: " + currentBounces + " / " + bounces;
+    
+    const char* text = stringTxt.c_str();
+//    cout << text << endl;
+    renderText(24, text, renderer, width - 300, 20);
+}
 
 //vector<Tile> loadTiles(int lvl) {
 //    vector<Tile> temp = {};
