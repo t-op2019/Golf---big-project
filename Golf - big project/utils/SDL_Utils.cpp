@@ -7,6 +7,16 @@
 
 #include "SDL_Utils.hpp"
 
+static TTF_Font* Bridge;
+
+void init() {
+    if (TTF_Init() == -1) {
+        cout << "TTF_Init: %s\n" << " " << TTF_GetError();
+        exit(2);
+    }
+    Bridge = TTF_OpenFont("./assets/fonts/font.ttf", 28);
+}
+
 // render images and textures functions
 // ***********************************************************
 
@@ -132,20 +142,16 @@ string interpretKey(SDL_KeyboardEvent* key) {
 // ***********************************************************
 
 void renderText(int fontSize, const char* input, SDL_Renderer* renderer, int x, int y) {
-    if (TTF_Init() == -1) {
-        cout << "TTF_Init: %s\n" << " " << TTF_GetError();
-        exit(2);
-    }
-    
     // font color
     SDL_Color white = {255, 255, 255};
-    TTF_Font* Bridge;
-    Bridge = TTF_OpenFont("assets/fonts/font.ttf", fontSize);
     
     // text surface
     SDL_Surface* textSurface = TTF_RenderText_Solid(Bridge, input, white);
     SDL_Texture* message = SDL_CreateTextureFromSurface(renderer, textSurface);
+    
     renderTexture(message, renderer, x, y);
+    SDL_FreeSurface(textSurface);
+    SDL_DestroyTexture(message);
 }
 
 // ***********************************************************

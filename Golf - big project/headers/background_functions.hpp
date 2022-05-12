@@ -19,10 +19,11 @@
 #include "Spike.hpp"
 #include "Ball.hpp"
 #include "Hole.hpp"
+#include "Axe.hpp"
 
 using namespace std;
 
-void setVariables(SDL_Window* _window, SDL_Renderer* _renderer, const string _windowTitle, int _width, int _height,int _lvl, int& _gameState);
+void setVariables(SDL_Window* _window, SDL_Renderer* _renderer, const string _windowTitle, int _width, int _height,int _lvl, int& _gameState, bool* _wonGame);
 
 void loadAllTexture();
 
@@ -38,7 +39,11 @@ void renderBackground();
 
 void renderObject(Entity entity);
 
+void renderPowerBar(Entity entity);
+
 void renderArrow(Entity& entity);
+
+void renderSword(Entity& entity);
 
 vector<Tile> loadTiles(int lvl);
 
@@ -48,6 +53,6 @@ vector<Spike> loadIntervalSpikes(int lvl);
 
 void loadLevels(int lvl);
 
-void renderLevelText(int lvl);
+void renderLevelText(int lvl, int currentStrokes, int currentBounces);
 
 void renderRequirements(int _currentStrokes, int _currentBounces);

@@ -11,11 +11,55 @@ vector<Tile> loadWalls(int lvl, SDL_Texture* wallTexture, SDL_Texture* spikedWal
     vector<Tile> temp = {};
     switch (lvl) {
         case 0:
-            temp.push_back(Tile(Vector(64 - 8, 64 * 3 - 8), spikedWallTexture, true, false));
-            temp.push_back(Tile(Vector(0, 0), wallTexture, false, false));
+            for (int i = 0; i <= 10; i++) {
+                temp.push_back(Tile(Vector(60 * i, 600 - 60 * 3), wallTexture, false, false));
+            }
+            for (int i = 1; i <= 10; i++) {
+                temp.push_back(Tile(Vector(800 - 60 * i, 60 * 2), wallTexture, false, false));
+            }
+            
             break;
+            
         case 1:
-            temp.push_back(Tile(Vector(64 - 8, 64 * 3 - 8), stickyWallTexture, false, true));
+            for (int i = 1; i <= 9; i++) {
+                temp.push_back(Tile(Vector(800 - 60, 600 - 60 * i), wallTexture, false, false));
+            }
+            for (int i = 1; i <= 7; i++) {
+                temp.push_back(Tile(Vector(800 - 60 * 4 - 8, 600 - 60 * i - 8), spikedWallTexture, true, false));
+            }
+            for (int i = 2; i <= 7; i++) {
+                temp.push_back(Tile(Vector(800 - 60 * i, 600 - 60 * 9), wallTexture, false, false));
+            }
+            for (int i = 8; i >= 2; i--) {
+                temp.push_back(Tile(Vector(800 - 60 * 7, 600 - 60 * i), wallTexture, false, false));
+            }
+            for (int i = 8; i <= 11; i++) {
+                temp.push_back(Tile(Vector(800 - 60 * i, 600 - 60 * 2), wallTexture, false, false));
+            }
+            for (int i = 3; i <= 8; i++) {
+                temp.push_back(Tile(Vector(800 - 60 * 11 - 8, 600 - 60 * i - 8), spikedWallTexture, true, false));
+            }
+            
+            break;
+            
+        case 2:
+            temp.push_back(Tile(Vector(800 - 60 - 8, 0 - 8), spikedWallTexture, true, false));
+            for (int i = 1; i <= 7; i++) {
+                temp.push_back(Tile(Vector(800 - 60 * 3, 600 - 60 * i), wallTexture, false, false));
+            }
+            temp.push_back(Tile(Vector(800 - 60 * 3, 600 - 60 * 8), stickyWallTexture, false, true));
+            for (int i = 4; i <= 11; i++) {
+                temp.push_back(Tile(Vector(800 - 60 * i, 600 - 60 * 8), wallTexture, false, false));
+            }
+            for (int i = 7; i >= 3; i--) {
+                temp.push_back(Tile(Vector(800 - 60 * 11, 600 - 60 * i), wallTexture, false, false));
+            }
+            temp.push_back(Tile(Vector(0 - 8, 600 - 60 * 8 - 8), spikedWallTexture, true, false));
+            temp.push_back(Tile(Vector(0 - 8, 600 - 60 - 8), spikedWallTexture, true, false));
+            temp.push_back(Tile(Vector(800 - 60 * 4, 600 - 60), stickyWallTexture, false, true));
+            
+            break;
+            
         default:
             break;
     }
@@ -25,11 +69,21 @@ vector<Tile> loadWalls(int lvl, SDL_Texture* wallTexture, SDL_Texture* spikedWal
 vector<Spike> loadSpikes(int lvl, SDL_Texture* spikeTextureActive, SDL_Texture* spikeTextureInactive) {
     vector<Spike> temp = {};
     switch (lvl) {
-        case 1:
-            temp.push_back(Spike(Vector(16 + 32 * 3, 16 + 32 * 2), spikeTextureInactive, spikeTextureActive, 100));
-            temp.push_back(Spike(Vector(16 + 32 * 4, 16 + 32), spikeTextureInactive, spikeTextureActive, 100));
-            temp.push_back(Spike(Vector(16 + 32 * 4, 16 + 32 * 3), spikeTextureInactive, spikeTextureActive, 100));
-            temp.push_back(Spike(Vector(16 + 32 * 5, 16 + 32 * 2), spikeTextureInactive, spikeTextureActive, 100));
+        case 2:
+            for (int j = 0; j <= 1; j++) {
+                for (int i = 5; i <= 9; i++) {
+                    temp.push_back(Spike(Vector(800 - 60 * i, 60 * j), spikeTextureInactive, spikeTextureActive, 100));
+                }
+            }
+            for (int j = 5; j <= 6; j++) {
+                for (int i = 5; i <= 7; i++) {
+                    temp.push_back(Spike(Vector(800 - 60 * j, 600 - 60 * i), spikeTextureInactive, spikeTextureActive, 50));
+                }
+            }
+            for (int i = 5; i <= 6; i++) {
+                temp.push_back(Spike(Vector(800 - 60 * 4, 600 - 60 * i), spikeTextureInactive, spikeTextureActive, 50));
+            }
+            
             break;
             
         default:
@@ -38,27 +92,49 @@ vector<Spike> loadSpikes(int lvl, SDL_Texture* spikeTextureActive, SDL_Texture* 
     return temp;
 }
 
-void loadLevel(int lvl, vector<Tile>& tiles,vector<Spike>& spikes,Ball& ball,Hole& hole, Vector& holePos, Vector& requirements, SDL_Texture* wallTexture, SDL_Texture* spikedWallTexture, SDL_Texture* stickyWallTexture, SDL_Texture* spikeTextureActive, SDL_Texture* spikeTextureInactive) {
+vector<Axe> loadAxes(int lvl, SDL_Texture* axeTexture) {
+    vector<Axe> temp = {};
+    switch (lvl) {
+        case 2:
+            temp.push_back(Axe(Vector(200, 300), axeTexture, 90, 5));
+            temp.push_back(Axe(Vector(400, 300), axeTexture, 0, 5));
+            break;
+            
+        default:
+            break;
+    }
+    return temp;
+};
+
+void loadLevel(int lvl, vector<Tile>& tiles, vector<Spike>& spikes, vector<Axe>& axes, Ball& ball, Hole& hole, Vector& holePos, Vector& requirements, SDL_Texture* wallTexture, SDL_Texture* spikedWallTexture, SDL_Texture* stickyWallTexture, SDL_Texture* spikeTextureActive, SDL_Texture* spikeTextureInactive, SDL_Texture* axeTexture) {
     ball.setVelocity(0, 0);
     ball.setScale(1, 1);
     ball.setWin(false);
     tiles = loadWalls(lvl, wallTexture, spikedWallTexture, stickyWallTexture);
     spikes = loadSpikes(lvl, spikeTextureActive, spikeTextureInactive);
+    axes = loadAxes(lvl, axeTexture);
     
     switch (lvl) {
         case 0:
-            ball.setPos(24 + 32 * 4, 24 + 32 * 11);
-            hole.setPos(24 + 32 * 4, 24 + 32 * 2);
-            holePos = Vector(24 + 32 * 4, 24 + 32 * 2);
-            requirements = Vector(3, 3);
+            ball.setPos(60 - 8, 600 - 60 - 8);
+            hole.setPos(800 - 60 - 8, 60 - 8);
+            requirements = Vector(7, 14);
             break;
             
         case 1:
-            ball.setPos(24 + 32 * 10, 24 + 32 * 14);
-            hole.setPos(24 + 32 * 4, 24 + 32 * 2);
-            holePos = Vector(24 + 32 * 4, 24 + 32 * 2);
-            requirements = Vector(2, 2);
+            ball.setPos(800 - 60 * 2 - 8, 600 - 60 - 8);
+            hole.setPos(800 - 60 * 9 - 8, 600 - 60 * 3 - 8);
+            requirements = Vector(8, 10);
+            break;
+            
+        case 2:
+            ball.setPos(800 - 60 - 8, 600 - 60 - 8);
+            hole.setPos(800 - 60 * 4 + 30 - 8, 600 - 60 * 7 + 30 - 8);
+            requirements = Vector(6, 8);
+            break;
+            
         default:
             break;
     }
+    holePos = Vector(hole.getPos().x, hole.getPos().y);
 }

@@ -17,6 +17,7 @@ using namespace std;
 
 // basic SDL functions
 // ***********************************************************
+void init();
 
 void logSDLError(const string &message, bool fatal = false);
 
