@@ -16,7 +16,6 @@
 		4FC796572807A0A9002E8E77 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FC796542807A0A9002E8E77 /* SDL2_ttf.framework */; };
 		4FC796582807A0A9002E8E77 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FC796552807A0A9002E8E77 /* SDL2.framework */; };
 		4FC796622807BCEA002E8E77 /* SDL_Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC796602807BCEA002E8E77 /* SDL_Utils.cpp */; };
-		4FC796672807C172002E8E77 /* game_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC796652807C172002E8E77 /* game_functions.cpp */; };
 		4FC7966B2807C59B002E8E77 /* background_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC796692807C59B002E8E77 /* background_functions.cpp */; };
 		4FC796702807E414002E8E77 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC7966E2807E414002E8E77 /* Entity.cpp */; };
 		4FC7967628084892002E8E77 /* Ball.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC7967428084892002E8E77 /* Ball.cpp */; };
@@ -52,7 +51,6 @@
 		4FC796552807A0A9002E8E77 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
 		4FC796602807BCEA002E8E77 /* SDL_Utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SDL_Utils.cpp; sourceTree = "<group>"; };
 		4FC796612807BCEA002E8E77 /* SDL_Utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SDL_Utils.hpp; sourceTree = "<group>"; };
-		4FC796652807C172002E8E77 /* game_functions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = game_functions.cpp; sourceTree = "<group>"; };
 		4FC796662807C172002E8E77 /* game_functions.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = game_functions.hpp; sourceTree = "<group>"; };
 		4FC796692807C59B002E8E77 /* background_functions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = background_functions.cpp; sourceTree = "<group>"; };
 		4FC7966A2807C59B002E8E77 /* background_functions.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = background_functions.hpp; sourceTree = "<group>"; };
@@ -174,7 +172,6 @@
 				4FC7965A2807A10E002E8E77 /* assets */,
 				4FC7965B2807A517002E8E77 /* objects */,
 				4FC7965F2807A842002E8E77 /* headers */,
-				4FC796652807C172002E8E77 /* game_functions.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -251,7 +248,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4FC7967628084892002E8E77 /* Ball.cpp in Sources */,
-				4FC796672807C172002E8E77 /* game_functions.cpp in Sources */,
 				4FC7964C2807A077002E8E77 /* main.cpp in Sources */,
 				4FC51B582809905B00F05BDE /* Hole.cpp in Sources */,
 				4F15C7E028235766007F05CE /* level_loader.cpp in Sources */,
