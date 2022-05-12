@@ -101,11 +101,6 @@
 			isa = PBXGroup;
 			children = (
 				4FC796632807C126002E8E77 /* src */,
-				4FC7965F2807A842002E8E77 /* headers */,
-				4FC7965B2807A517002E8E77 /* objects */,
-				4FC7965A2807A10E002E8E77 /* assets */,
-				4FC796592807A0FD002E8E77 /* utils */,
-				4FC7964B2807A077002E8E77 /* main.cpp */,
 			);
 			path = "Golf - big project";
 			sourceTree = "<group>";
@@ -174,6 +169,11 @@
 		4FC796632807C126002E8E77 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				4FC7964B2807A077002E8E77 /* main.cpp */,
+				4FC796592807A0FD002E8E77 /* utils */,
+				4FC7965A2807A10E002E8E77 /* assets */,
+				4FC7965B2807A517002E8E77 /* objects */,
+				4FC7965F2807A842002E8E77 /* headers */,
 				4FC796652807C172002E8E77 /* game_functions.cpp */,
 			);
 			path = src;

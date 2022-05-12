@@ -7,7 +7,6 @@
 
 #include "headers/Ball.hpp"
 #include "headers/background_functions.hpp"
-#include "headers/Entity.hpp"
 #include "headers/Ball.hpp"
 #include "headers/Hole.hpp"
 #include "headers/Tile.hpp"

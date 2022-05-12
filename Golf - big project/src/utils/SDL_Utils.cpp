@@ -14,7 +14,7 @@ void init() {
         cout << "TTF_Init: %s\n" << " " << TTF_GetError();
         exit(2);
     }
-    Bridge = TTF_OpenFont("./assets/fonts/font.ttf", 28);
+    Bridge = TTF_OpenFont("src/assets/fonts/font.ttf", 28);
 }
 
 // render images and textures functions

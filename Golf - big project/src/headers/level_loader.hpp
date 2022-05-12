@@ -7,11 +7,6 @@
 
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <SDL2/SDL.h>
-
-#include "Entity.hpp"
 #include "Tile.hpp"
 #include "Hole.hpp"
 #include "Spike.hpp"

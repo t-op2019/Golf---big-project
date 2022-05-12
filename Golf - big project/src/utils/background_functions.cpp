@@ -67,7 +67,7 @@ void setVariables(SDL_Window* _window, SDL_Renderer* _renderer, const string _wi
 
 void loadAllTexture() {
     initSDL(window, renderer, windowTitle, width, height);
-    const string defaultRoutes = "assets/images/";
+    const string defaultRoutes = "src/assets/images/";
     
     background = loadTexture(defaultRoutes + "bg.png", renderer);
     ballTxture = loadTexture(defaultRoutes + "ball.png", renderer);

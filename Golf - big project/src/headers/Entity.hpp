@@ -8,6 +8,10 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cmath>
 #include <SDL2/SDL.h>
 #include <SDL2_image/SDL_image.h>
 

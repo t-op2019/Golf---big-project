@@ -7,14 +7,8 @@
 
 #pragma once
 
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <string>
-
 #include "SDL_Utils.hpp"
 #include "level_loader.hpp"
-#include "Entity.hpp"
 #include "Tile.hpp"
 #include "Spike.hpp"
 #include "Ball.hpp"

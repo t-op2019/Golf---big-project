@@ -7,13 +7,25 @@
 
 #include "Ball.hpp"
 
-#include <cmath>
-
 Ball::Ball(Vector _pos, SDL_Texture* _texture, SDL_Texture* _pointArrowTexture, SDL_Texture* _powerMeterForeground, SDL_Texture* _powerMeterBackground, int _index) : Entity(_pos, _texture) {
+    int x = getPos().x + (getFrame().w - getFrame().w * getScale().x) / 2;
+    int y = getPos().y + (getFrame().h - getFrame().h * getScale().y) / 2;
+    int w = getFrame().w * getScale().x;
+    int h = getFrame().h * getScale().y;
+    rect.x = x;
+    rect.y = y;
+    rect.w = w;
+    rect.h = h;
     index = _index;
-    points.push_back(Entity(Vector(-64, -64), _pointArrowTexture));
-    powerBar.push_back(Entity(Vector(-64, -64), _powerMeterBackground));
-    powerBar.push_back(Entity(Vector(-64, -64), _powerMeterForeground));
+    points.push_back(Entity(Vector(-699, -699), _pointArrowTexture));
+    powerBar.push_back(Entity(Vector(-699, -699), _powerMeterBackground));
+    powerBar.push_back(Entity(Vector(-699, -699), _powerMeterForeground));
+}
+
+SDL_Rect* Ball::getRect(int x, int y) {
+    rect.x = x;
+    rect.y = y;
+    return &rect;
 }
 
 vector<Entity> Ball::getPoints() {
@@ -127,26 +139,29 @@ int Ball::getNumOfLines() {
 }
 
 // function for updating the ball positions when swung, hit walls and hit goals
-void Ball::update(SDL_Renderer* renderer, double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, Hole hole, int &_gameState) {
+void Ball::update(SDL_Renderer* renderer, double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, vector<Axe> axes, Hole hole, int &_gameState) {
 //    cout << swung << endl;
     if (win) {
         // shifts the position of ball to the center of hole's position by 0.1 * delta if the ball's texture is in the hole's texture
         if (getPos().x < target.x) {
-            setPos(getPos().x + 1.5 * delta, getPos().y);
+            setPos(getPos().x + 0.1 * delta, getPos().y);
         } else if (getPos().x > target.x) {
-            setPos(getPos().x - 1.5 * delta, getPos().y);
+            setPos(getPos().x - 0.1 * delta, getPos().y);
         }
         if (getPos().y < target.y) {
-            setPos(getPos().x, getPos().y + 1.5 * delta);
+            setPos(getPos().x, getPos().y + 0.1 * delta);
         } else if (getPos().y > target.y) {
-            setPos(getPos().x, getPos().y - 1.5 * delta);
+            setPos(getPos().x, getPos().y - 0.1 * delta);
         }
         
-        setVelocity(velocity.x - 0.05 * delta, velocity.y - 0.05 * delta);
-        setArrowVelocity(arrowVelocity.x - 0.05 * delta, arrowVelocity.y - 0.05 * delta);
+        setVelocity(velocity.x - delta * velocity.x, velocity.y - delta * velocity.y);
+        setArrowVelocity(arrowVelocity.x - delta * arrowVelocity.x, arrowVelocity.y - delta * arrowVelocity.y);
         
         // decrease the size the of ball gradually as it enters the hole
         setScale(getScale().x - 0.05 * delta, getScale().y - 0.05 * delta);
+        
+        setVelocity(0, 0);
+        setArrowVelocity(0, 0);
     }
     
     // check if ball is in hole ---------------------------------------------------------------------------
@@ -173,31 +188,48 @@ void Ball::update(SDL_Renderer* renderer, double delta, bool isMouseDown, bool i
         // get the mouse position and set its coordinates onto mouseX and mouseY
         SDL_GetMouseState(&mouseX, &mouseY);
         // change the value of powerConstant to change the velocity limit (the smaller the powerConstant, the harder the player can swing)
-        const int powerConstant = 50;
-        // calculate velocity using the current and initial mouse potitions
-        setArrowVelocity((mouseX - getInitialMousePos().x) / -powerConstant, (mouseY - getInitialMousePos().y) / -powerConstant);
-//        setVelocity((mouseX - getInitialMousePos().x) / -powerConstant, (mouseY - getInitialMousePos().y) / -powerConstant);
-        setLauchVelocity((mouseX - getInitialMousePos().x) / -powerConstant, (mouseY - getInitialMousePos().y) / -powerConstant);
-        // calculate velocity value
-        velocityValue = SDL_sqrt(SDL_pow(SDL_abs(getArrowVelocity().x), 2) + SDL_pow(SDL_abs(getArrowVelocity().y), 2));
-        lauchedVelocityValue = velocityValue;
+        const int powerConstant = 15;
+        // calculate unit vector velocity using the current and initial mouse potitions
+        double currentXVelocity = (mouseX - getInitialMousePos().x) / -powerConstant;
+        double currentYVelocity = (mouseY - getInitialMousePos().y) / -powerConstant;
+        double currentVelocityValue = sqrt(currentXVelocity * currentXVelocity + currentYVelocity * currentYVelocity);
+        double currentAngle = -SDL_atan2(currentYVelocity, currentXVelocity) * (180 / M_PI);
+        
+        // limit the total velocity to 10
+        if (currentVelocityValue <= 5) {
+            setArrowVelocity(currentXVelocity, currentYVelocity);
+            setLauchVelocity(currentXVelocity, currentYVelocity);
+            velocityValue = currentVelocityValue;
+            lauchedVelocityValue = velocityValue;
+        } else {
+            currentXVelocity = SDL_cos(currentAngle / 180 * M_PI) * 5;
+            currentYVelocity = SDL_sin(currentAngle / 180 * M_PI) * -5;
+            setArrowVelocity(currentXVelocity, currentYVelocity);
+            setLauchVelocity(currentXVelocity, currentYVelocity);
+            velocityValue = 5;
+            lauchedVelocityValue = 5;
+        }
         
         // setup pointing arrow's direction
         points.at(0).setPos(getPos().x, getPos().y - 24);
         points.at(0).setAngle(SDL_atan2(getArrowVelocity().y, getArrowVelocity().x) * (180 / M_PI) + 90);
+        
+        // set length of the pointing arrow proportional to the velocity value
+        points.at(0).setScale(1, velocityValue / 1.5);
         
         // determine the direction of x and y of the velocity (whether it be positive or negative) to change its direction
         directionX = getArrowVelocity().x / abs(getArrowVelocity().x);
         directionY = getArrowVelocity().y / abs(getArrowVelocity().y);
         
         // setup the power meter bar
-        powerBar.at(0).setPos(getPos().x + 40, getPos().y - 32);
-        powerBar.at(1).setPos(getPos().x + 44, getPos().y + 4 - 32 * powerBar.at(1).getScale().y);
+        powerBar.at(0).setPos(getPos().x, getPos().y + 20);
+        powerBar.at(1).setScale(velocityValue / 5, 1);
+        powerBar.at(1).setPos(getPos().x + 5, getPos().y + 25);
         
         // draw path prediction line
-        Vector startPos = Vector(getPos().x + 8, getPos().y + 8);
-        vector<SDL_Point> points = updateLine(tiles, arrowVelocity, startPos);
-        setLines(points);
+//        Vector startPos = Vector(getPos().x + 8, getPos().y + 8);
+//        vector<SDL_Point> points = updateLine(tiles, arrowVelocity, startPos);
+//        setLines(points);
         
         // if the player's swing power exceeds the limit, set the velocity value to be 1 (at limit)
         if (velocityValue > 1) {
@@ -206,14 +238,13 @@ void Ball::update(SDL_Renderer* renderer, double delta, bool isMouseDown, bool i
         }
         
         // set the power meter bar according to the velocity value (scale y means how long the meter will be)
-        powerBar.at(1).setScale(1, velocityValue / 1);
         setPos(getPos().x + getVelocity().x * delta * 0.25, getPos().y + getVelocity().y * delta * 0.25);
     } else {
         setNumOfLines(0);
         setVelocity(getArrowVelocity().x, getArrowVelocity().y);
-        points.at(0).setPos(-64, -64);
-        powerBar.at(0).setPos(-64, -64);
-        powerBar.at(1).setPos(-64, -64);
+        points.at(0).setPos(-699, -699);
+        powerBar.at(0).setPos(-699, -699);
+        powerBar.at(1).setPos(-699, -699);
         canMove = false;
         // shift the position of the ball towards the direction of the velocity (times delta to move it bit by bit, therefore creating an animation)
         setPos(getPos().x + getVelocity().x * delta, getPos().y + getVelocity().y * delta);
@@ -263,41 +294,51 @@ void Ball::update(SDL_Renderer* renderer, double delta, bool isMouseDown, bool i
         directionY = 1;
     }
     
+    // get the next coordinate for x and y
+    double newCoordinateX = getPos().x + getVelocity().x * delta * 1.2;
+    double newCoordinateY = getPos().y + getVelocity().y * delta * 1.2;
+    
+//    SDL_Point newPointTopLeft = {(int)newCoordinateX, (int)newCoordinateY};
+//    SDL_Point newPointBottomRight = {(int)(newCoordinateX + 16), (int)(newCoordinateY + 16)};
+    
+    // check for axe collision ------------------------------------------------------------------------------------
+    for (Axe& axe : axes) {
+        Vector axeOrigin = axe.getOrigin();
+        Vector axeEndpoint = axe.getEndpoint();
+        double ballAndOriginAngleLeft = SDL_atan2((newCoordinateY - axeOrigin.y) , (newCoordinateX - axeOrigin.x)) / M_PI * 180;
+        double ballAndOriginAngleRight = SDL_atan2((newCoordinateY + 16 - axeOrigin.y) , (newCoordinateX + 16 - axeOrigin.x)) / M_PI * 180;
+        double axeAngle = SDL_atan((axeEndpoint.y - axeOrigin.y) / (axeEndpoint.x - axeOrigin.x)) / M_PI * 180;
+        
+        double radiusLeft = sqrt(pow(newCoordinateX - axeOrigin.x, 2) + pow(newCoordinateY - axeOrigin.y, 2));
+        double radiusRight = sqrt(pow(newCoordinateX + 16 - axeOrigin.x, 2) + pow(newCoordinateY + 16 - axeOrigin.y, 2));
+
+        bool ballInRadius = (radiusLeft <= 100) || radiusRight <= 100;
+        
+//        cout << getVelocity().x << ", " << getVelocity().y << endl;
+//        cout << (ballInRadius ? "In range" : "") << endl;
+    
+        if ((abs(ballAndOriginAngleLeft - axeAngle) <= axe.getRotationRate() || abs(ballAndOriginAngleRight - axeAngle) <= axe.getRotationRate()) && ballInRadius) {
+            reset();
+            _gameState = 3;
+        }
+    }
+    
     // check for obstacle collision -------------------------------------------------------------------------------
     for (Tile& tile : tiles) {
-        // get the next coordinate for x and y
         double newCoordinateX = getPos().x + getVelocity().x * delta * 1.2;
         double newCoordinateY = getPos().y + getVelocity().y * delta * 1.2;
-        
-        SDL_Point newPointTopLeft = {(int)newCoordinateX, (int)newCoordinateY};
-        SDL_Point newPointBottomRight = {(int)(newCoordinateX + 16), (int)(newCoordinateY + 16)};
-        
-        if (SDL_PointInRect(&newPointTopLeft, tile.getRect()) || SDL_PointInRect(&newPointBottomRight, tile.getRect())) {
+        bool hitX = false;
+        bool hitY = false;
+//        if (SDL_PointInRect(&newPointTopLeft, tile.getRect()) || SDL_PointInRect(&newPointBottomRight, tile.getRect())) {
             // check if the ball hit the horizontal edge of the wall
-            if (newCoordinateX >= tile.getPos().x && newCoordinateX + 16 <= tile.getPos().x + tile.getFrame().w) {
+            if (newCoordinateX + 16 > tile.getPos().x && newCoordinateX < tile.getPos().x + tile.getFrame().w && getPos().y + 16 > tile.getPos().y && getPos().y < tile.getPos().y + tile.getFrame().h - 2) {
                 // if the wall is spiked, then reset the level
                 if (tile.getIsSpike()) {
                     reset();
                     _gameState = 3;
                 } else if (tile.getIsSticky() && !swung) {
                     // if the wall is sticky, then decrease all velocity
-                    setVelocity(0, 0);
-                    setArrowVelocity(0, 0);
-                    velocityValue = 0;
-                    lauchedVelocityValue = 0;
-                } else {
-                    bounce++;
-                    setVelocity(getVelocity().x, getVelocity().y * -1);
-                    setArrowVelocity(getArrowVelocity().x, getArrowVelocity().y * -1);
-                    directionY *= -1;
-                }
-            }
-            // check if the ball hit the vertical edge of the wall
-            else if (newCoordinateY >= tile.getPos().y && newCoordinateY + 16 <= tile.getPos().y + tile.getFrame().h - 3) {
-                if (tile.getIsSpike()) {
-                    reset();
-                    _gameState = 3;
-                } else if (tile.getIsSticky() && !swung) {
+                    setPos(directionX == 1 ? tile.getPos().x - 16 : tile.getPos().x + 64, getPos().y);
                     setVelocity(0, 0);
                     setArrowVelocity(0, 0);
                     velocityValue = 0;
@@ -307,48 +348,40 @@ void Ball::update(SDL_Renderer* renderer, double delta, bool isMouseDown, bool i
                     setVelocity(getVelocity().x * -1, getVelocity().y);
                     setArrowVelocity(getArrowVelocity().x * -1, getArrowVelocity().y);
                     directionX *= -1;
+//                    break;
                 }
+                hitX = true;
             }
+            // check if the ball hit the vertical edge of the wall
+            if (getPos().x + 16 > tile.getPos().x && getPos().x < tile.getPos().x + tile.getFrame().w && newCoordinateY + 16 > tile.getPos().y && newCoordinateY < tile.getPos().y + tile.getFrame().h - 2) {
+                if (tile.getIsSpike()) {
+                    reset();
+                    _gameState = 3;
+                } else if (tile.getIsSticky() && !swung) {
+                    setPos(getPos().x, directionY == 1 ? tile.getPos().y - 16 : tile.getPos().y + 64);
+                    setVelocity(0, 0);
+                    setArrowVelocity(0, 0);
+                    velocityValue = 0;
+                    lauchedVelocityValue = 0;
+                } else {
+                    bounce++;
+                    setVelocity(getVelocity().x, getVelocity().y * -1);
+                    setArrowVelocity(getArrowVelocity().x, getArrowVelocity().y * -1);
+                    directionY *= -1;
+//                    break;
+                }
+//            }
+                hitY = true;
         }
-        
-//        bool hitTile = (newCoordinateX + 16 > tile.getPos().x && newCoordinateX < tile.getPos().x + tile.getFrame().w) && (newCoordinateY + 16 > tile.getPos().y && newCoordinateY < tile.getPos().y + tile.getFrame().h - 3);
-//
-//        // check if coordinate x hits an obstacle, then change the direction of the x vector
-//        if (hitTile) {
-//            // if the wall is a spiked wall then reset the gamestate
-//            if (tile.isSpike) {
-//                reset();
-//                _gameState = 3;
-//            } else {
-//                bounce++;
-//                setVelocity(getVelocity().x * -1, getVelocity().y);
-//                setArrowVelocity(getArrowVelocity().x * -1, getArrowVelocity().y);
-//                directionX *= -1;
-//            }
-//        }
-//
-//        newCoordinateX = getPos().x;
-//        newCoordinateY = getPos().y + getVelocity().y * delta;
-//
-//        // check the same y coordinate as x
-//        if (hitTile) {
-//            // if the wall is a spiked wall then reset the gamestate
-//            if (tile.isSpike) {
-//                reset();
-//                _gameState = 3;
-//            } else {
-//                bounce++;
-//                setVelocity(getVelocity().x, getVelocity().y * -1);
-//                setArrowVelocity(getArrowVelocity().x, getArrowVelocity().y * -1);
-//                directionY *= -1;
-//            }
-//        }
+        if (hitX || hitY) {
+            break;
+        }
     }
     
     // check if ball is running through active spikes
     for (Spike spike : spikes) {
         if (spike.getOpen()) {
-            if (getPos().x + 8 > spike.getPos().x && getPos().x < spike.getPos().x + 8 && getPos().y + 8 > spike.getPos().y && getPos().y < spike.getPos().y + 8) {
+            if (getPos().x > spike.getPos().x && getPos().x + 16 < spike.getPos().x + spike.getFrame().w && getPos().y > spike.getPos().y && getPos().y + 16 < spike.getPos().y + spike.getFrame().h - 2) {
                 reset();
                 _gameState = 3;
             }

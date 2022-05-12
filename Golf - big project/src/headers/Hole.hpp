@@ -7,9 +7,6 @@
 
 #pragma once
 
-#include <iostream>
-#include <SDL2/SDL.h>
-
 #include "Entity.hpp"
 
 class Hole : public Entity {
