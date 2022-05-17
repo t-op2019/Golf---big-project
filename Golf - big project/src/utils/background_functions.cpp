@@ -10,8 +10,8 @@
 // basic background functions (load/unload textures, render and rerender screen
 // *********************************************************************************
 
-SDL_Window* window;
-SDL_Renderer* renderer;
+SDL_Window *window;
+SDL_Renderer *renderer;
 string windowTitle;
 int width, height;
 
@@ -21,9 +21,15 @@ int lvl;
 // 1: in game
 // 2: end screen
 // 3: fail stage
-int gameState = 1;
+int gameState;
 
-bool* wonGame = NULL;
+// loseContext: reason for losing
+// 1: maximum strokes exceeded
+// 2: maximum bounces exceeded
+// 3: touched spike
+int loseContext = 0;
+
+bool *wonGame = NULL;
 
 bool mouseDown = false;
 bool mousePressed = false;
@@ -41,9 +47,13 @@ int counter = 0;
 // current position of the hole
 Vector currentHolePos = Vector(0, 0);
 
+Vector initialBallPos = Vector(0, 0);
+Vector initialBallVelocity = Vector(0, 0);
+
 SDL_Texture *background, *playButton, *ballTxture, *ballShadow, *holeTxture, *point, *powerBar, *powerBarBg, *wall, *spikeTileInactive, *spikeTileActive, *spikeWall, *stickyWall, *axe;
 
-Ball ball = Ball(Vector(0, 0), ballTxture, point, powerBar, powerBarBg, 0);
+Ball ball = Ball(Vector(0, 0), ballTxture, point, powerBar, powerBarBg);
+vector<Ball> balls = {};
 Hole hole = Hole(Vector(0, 0), holeTxture);
 vector<Tile> tiles = {};
 vector<Spike> spikes = {};
@@ -54,7 +64,8 @@ vector<Axe> axes = {};
 // requirements.y: maximum number of bounces
 Vector requirements = Vector(0, 0);
 
-void setVariables(SDL_Window* _window, SDL_Renderer* _renderer, const string _windowTitle, int _width, int _height, int _lvl, int& _gameState, bool* _wonGame) {
+void setVariables(SDL_Window *_window, SDL_Renderer *_renderer, const string _windowTitle, int _width, int _height, int _lvl, int &_gameState, bool *_wonGame, Vector initialPos, Vector initialVelocity)
+{
     window = _window;
     renderer = _renderer;
     windowTitle = _windowTitle;
@@ -63,12 +74,16 @@ void setVariables(SDL_Window* _window, SDL_Renderer* _renderer, const string _wi
     lvl = _lvl;
     gameState = _gameState;
     wonGame = _wonGame;
+    initialBallPos = Vector(initialPos.x, initialPos.y);
+    initialBallVelocity = Vector(initialVelocity.x, initialVelocity.y);
 }
 
-void loadAllTexture() {
-    initSDL(window, renderer, windowTitle, width, height);
+// load all neccessary textures
+void loadAllTexture()
+{
+    // default path to images folder
     const string defaultRoutes = "src/assets/images/";
-    
+
     background = loadTexture(defaultRoutes + "bg.png", renderer);
     ballTxture = loadTexture(defaultRoutes + "ball.png", renderer);
     ballShadow = loadTexture(defaultRoutes + "ball_shadow.png", renderer);
@@ -83,18 +98,23 @@ void loadAllTexture() {
     spikeWall = loadTexture(defaultRoutes + "spike_wall.png", renderer);
     stickyWall = loadTexture(defaultRoutes + "sticky_wall.png", renderer);
     axe = loadTexture(defaultRoutes + "axe.png", renderer);
-    
-    if (background == NULL | playButton == NULL | ballTxture == NULL | ballShadow == NULL | holeTxture == NULL | point == NULL | powerBar == NULL | powerBarBg == NULL | wall == NULL | spikeTileActive == NULL | spikeTileInactive == NULL | spikeWall == NULL | stickyWall == NULL) {
+
+    if (background == NULL | playButton == NULL | ballTxture == NULL | ballShadow == NULL | holeTxture == NULL | point == NULL | powerBar == NULL | powerBarBg == NULL | wall == NULL | spikeTileActive == NULL | spikeTileInactive == NULL | spikeWall == NULL | stickyWall == NULL)
+    {
         unloadAllTexture();
         exit(1);
     }
-    
-    ball = Ball(Vector(0, 0), ballTxture, point, powerBar, powerBarBg, 0);
+
+    Ball ballSet = Ball(Vector(0, 0), ballTxture, point, powerBar, powerBarBg);
+    balls.push_back(ballSet);
+    // ball = ballSet;
     hole = Hole(Vector(0, 0), holeTxture);
-    loadLevel(lvl, tiles, spikes, axes, ball, hole, currentHolePos, requirements, wall, spikeWall, stickyWall, spikeTileActive, spikeTileInactive, axe);
+    loadLevel(lvl, tiles, spikes, axes, balls[0], hole, currentHolePos, requirements, wall, spikeWall, stickyWall, spikeTileActive, spikeTileInactive, axe);
 }
 
-void unloadAllTexture() {
+// unload all textures and quit SDL
+void unloadAllTexture()
+{
     SDL_DestroyTexture(background);
     SDL_DestroyTexture(ballTxture);
     SDL_DestroyTexture(ballShadow);
@@ -109,11 +129,17 @@ void unloadAllTexture() {
     SDL_DestroyTexture(stickyWall);
     SDL_DestroyTexture(spikeWall);
     SDL_DestroyTexture(axe);
-    
+
     quitSDL(window, renderer);
 }
 
-void update(bool& _isPlaying, SDL_Event _event) {
+void loadStartScreen(bool &_isPlaying, SDL_Event _event) {
+    event = _event;
+}
+
+// update states of objects in the game
+void update(bool &_isPlaying, SDL_Event _event)
+{
     event = _event;
     // update frame
     lastTick = currentTick;
@@ -122,152 +148,200 @@ void update(bool& _isPlaying, SDL_Event _event) {
     counter++;
     //    cout << counter << endl;
     mousePressed = false;
-    
+
     // if the number of strokes or bounces exceeds the maximum number, reset the level
-    if (ball.getStroke() > requirements.x || ball.getBounce() > requirements.y) {
+    if (balls[0].getStroke() > requirements.x || balls[0].getBounce() > requirements.y)
+    {
+        loseContext = balls[0].getStroke() > requirements.x ? 1 : 2;
         gameState = 3;
-        ball.reset();
+        // balls[0].reset();
     }
-    
+
     // get controls
-    
+    if (interpretKey(&event.key) == "Return" && gameState == 0) {
+        lvl = 0;
+        gameState = 1;
+        loseContext = 0;
+        balls[0].reset();
+        loadLevel(lvl, tiles, spikes, axes, balls[0], hole, currentHolePos, requirements, wall, spikeWall, stickyWall, spikeTileActive, spikeTileInactive, axe);
+    }
+
     // reset level if player hit R key
-    if (interpretKey(&event.key) == "R") {
-        if (*wonGame) {
+    if (interpretKey(&event.key) == "R")
+    {
+        if (*wonGame)
+        {
             lvl = -1;
-            gameState = 1;
             *wonGame = false;
-        } else {
-            gameState = 3;
         }
-        ball.reset();
+
+        gameState = 1;
+        loseContext = 0;
+        balls[0].reset();
+        loadLevel(lvl, tiles, spikes, axes, balls[0], hole, currentHolePos, requirements, wall, spikeWall, stickyWall, spikeTileActive, spikeTileInactive, axe);
     }
-    
+
     // get other events
-    switch (event.type) {
-        case SDL_QUIT:
-            _isPlaying = false;
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                mouseDown = true;
-                mousePressed = true;
-            }
-            break;
-        case SDL_MOUSEBUTTONUP:
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                mouseDown = false;
-                ball.setSwung(true);
-                ball.setStroke(ball.getStroke() + 1);
-            }
-            break;
+    switch (event.type)
+    {
+    case SDL_QUIT:
+        _isPlaying = false;
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        if (event.button.button == SDL_BUTTON_LEFT)
+        {
+            mouseDown = true;
+            mousePressed = true;
+        }
+        break;
+    case SDL_MOUSEBUTTONUP:
+        if (event.button.button == SDL_BUTTON_LEFT)
+        {
+            mouseDown = false;
+            balls[0].setSwung(true);
+            balls[0].setStroke(balls[0].getStroke() + 1);
+        }
+        break;
     }
     
-    if (gameState == 1) {
-        ball.update(renderer, delta, mouseDown, mousePressed, tiles, spikes, axes, hole, gameState);
+    if (gameState == 0) {
+        balls[0].update(renderer, delta, mouseDown, mousePressed, tiles, spikes, axes, hole, gameState, loseContext);
+    }
+
+    // if is in the game, update ball and other objects
+    if (gameState == 1)
+    {
+        balls[0].update(renderer, delta, mouseDown, mousePressed, tiles, spikes, axes, hole, gameState, loseContext);
         // update spinning spikes
-        for (int i = 0; i < axes.size(); i++) {
+        for (int i = 0; i < axes.size(); i++)
+        {
             axes[i].update(delta, mouseDown);
         }
         // update spiked tiles
-        for (int i = 0; i < spikes.size(); i++) {
+        for (int i = 0; i < spikes.size(); i++)
+        {
             spikes[i].update(counter);
         }
-        ball.resetSwung(counter);
+        balls[0].resetSwung(counter);
     }
-    
-    if (gameState == 3) {
-        loadLevel(lvl, tiles, spikes, axes, ball, hole, currentHolePos, requirements, wall, spikeWall, stickyWall, spikeTileActive, spikeTileInactive, axe);
-        gameState = 1;
+
+    // if failed the level, stop the ball
+    if (gameState == 3)
+    {
+        balls[0].reset();
+        // loadLevel(lvl, tiles, spikes, axes, balls[0], hole, currentHolePos, requirements, wall, spikeWall, stickyWall, spikeTileActive, spikeTileInactive, axe);
+        // gameState = 1;
     }
-    
-    if (ball.hasWon() && lvl == 2) {
+
+    if (balls[0].hasWon() && lvl == 2)
+    {
         *wonGame = true;
-    } else if (ball.getScale().x < -1) {
+    }
+    else if (balls[0].getScale().x < -1)
+    {
         //        if (lvl != 2) {
         counter = 0;
-        ball.reset();
+        balls[0].reset();
         lvl++;
-        loadLevel(lvl, tiles, spikes, axes, ball, hole, currentHolePos, requirements, wall, spikeWall, stickyWall, spikeTileActive, spikeTileInactive, axe);
-        
+        loadLevel(lvl, tiles, spikes, axes, balls[0], hole, currentHolePos, requirements, wall, spikeWall, stickyWall, spikeTileActive, spikeTileInactive, axe);
     };
-    
+
     // if ball is shrunk all the way -> win -> next lvl
-    
-    
+
     refresh();
 }
 
-void refresh() {
+void refresh()
+{
     // clear screen
     //    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
     renderBackground();
-    
+
     // render hole
     hole.setPos(currentHolePos.x, currentHolePos.y);
     renderObject(hole);
-    
+
     // render spiked tiles
-    for (Spike spike : spikes) {
+    for (Spike spike : spikes)
+    {
         renderObject(spike);
     }
-    
+
     // render tiles
-    for (Tile tile : tiles) {
+    for (Tile tile : tiles)
+    {
         renderObject(tile);
     }
-    
+
     // render level text
-    renderLevelText(lvl, ball.getStroke(), ball.getBounce());
+    if (gameState != 0) {
+        renderLevelText(lvl, balls[0].getStroke(), balls[0].getBounce());
+    } else {
+        renderStartScreen();
+    }
     
     // render ball
-    if (!ball.hasWon()) {
-        renderTexture(ballShadow, renderer, ball.getPos().x, ball.getPos().y + 4);
+    if (!balls[0].hasWon())
+    {
+        renderTexture(ballShadow, renderer, balls[0].getPos().x, balls[0].getPos().y + 4);
     }
     // render pointer arrow
-    for (Entity& arrow : ball.getPoints()) {
+    for (Entity &arrow : balls[0].getPoints())
+    {
         renderArrow(arrow);
     }
     // render powerbar
-    for (Entity& powerbar : ball.getPowerBar()) {
+    for (Entity &powerbar : balls[0].getPowerBar())
+    {
         renderPowerBar(powerbar);
     }
     // render ball texture
-    renderObject(ball);
-    
+    renderObject(balls[0]);
+
     // render spinning axes
-    for (Axe axe : axes) {
-        renderSword(axe);
-        //        Ball testBall = Ball(Vector(axe.getEndpoint().x, axe.getEndpoint().y), ballTxture, point, powerBar, powerBarBg, 1);
-        //        renderObject(testBall);
-    }
-    
+    // for (Axe axe : axes)
+    // {
+    //     renderSword(axe);
+    //     //        Ball testBall = Ball(Vector(axe.getEndpoint().x, axe.getEndpoint().y), ballTxture, point, powerBar, powerBarBg, 1);
+    //     //        renderObject(testBall);
+    // }
+
     // render path prediction line
     //    int numOfLines = ball.getNumOfLines();
     //    if (numOfLines > 0) {
     //        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
     //        SDL_RenderDrawLines(renderer, ball.getLines(), numOfLines);
     //    }
-    
-    if (*wonGame) {
+
+    if (loseContext > 0)
+    {
+        renderLose(loseContext);
+        renderReplay();
+    }
+
+    if (*wonGame)
+    {
         //        cout << "what the fuck" << endl;
         renderText(36, "YOU HAVE WON!", renderer, width / 2 - 100, height / 2);
-        renderText(36, "Press R to play again", renderer, width / 2 - 120, height / 2 + 30);
+        renderReplay();
     }
-    
+
     renderPresent();
 }
 
-void renderPresent() {
+void renderPresent()
+{
     SDL_RenderPresent(renderer);
 }
 
-void renderBackground() {
+void renderBackground()
+{
     renderTexture(background, renderer, 0, 0, width, height);
 }
 
-void renderObject(Entity entity) {
+void renderObject(Entity entity)
+{
     SDL_Rect destination;
     // get position x and y of the object and centers it with various scales
     int x = entity.getPos().x + (entity.getFrame().w - entity.getFrame().w * entity.getScale().x) / 2;
@@ -275,35 +349,37 @@ void renderObject(Entity entity) {
     // get width and height of the object (calculated after being scaled)
     int w = entity.getFrame().w * entity.getScale().x;
     int h = entity.getFrame().h * entity.getScale().y;
-    
+
     destination.x = x;
     destination.y = y;
     destination.w = w;
     destination.h = h;
-    
+
     renderTexture(entity.getTexture(), renderer, x, y, w, h);
 }
 
-void renderPowerBar(Entity entity) {
+void renderPowerBar(Entity entity)
+{
     SDL_Rect source;
     source.x = 0;
     source.y = 0;
     //    source.w;
     //    source.h;
-    
+
     SDL_QueryTexture(entity.getTexture(), NULL, NULL, &source.w, &source.h);
     source.w *= entity.getScale().x;
-    
+
     SDL_Rect destination;
     destination.x = entity.getPos().x;
     destination.y = entity.getPos().y;
     destination.w = source.w;
     destination.h = source.h;
-    
+
     SDL_RenderCopy(renderer, entity.getTexture(), &source, &destination);
 }
 
-void renderArrow(Entity& entity) {
+void renderArrow(Entity &entity)
+{
     SDL_Rect destination;
     // get position x and y of the object and centers it with various scales
     int x = entity.getPos().x + (entity.getFrame().w - entity.getFrame().w * entity.getScale().x) / 2;
@@ -311,16 +387,17 @@ void renderArrow(Entity& entity) {
     // get width and height of the object (calculated after being scaled)
     int w = entity.getFrame().w * entity.getScale().x;
     int h = entity.getFrame().h * entity.getScale().y;
-    
+
     destination.x = x;
     destination.y = y;
     destination.w = w;
     destination.h = h;
-    
+
     SDL_RenderCopyEx(renderer, entity.getTexture(), NULL, &destination, entity.getAngle(), 0, SDL_FLIP_NONE);
 }
 
-void renderSword(Entity& entity) {
+void renderSword(Entity &entity)
+{
     SDL_Rect destination;
     // get position x and y of the object and centers it with various scales
     int x = entity.getPos().x + (entity.getFrame().w - entity.getFrame().w * entity.getScale().x) / 2;
@@ -328,35 +405,54 @@ void renderSword(Entity& entity) {
     // get width and height of the object (calculated after being scaled)
     int w = entity.getFrame().w * entity.getScale().x;
     int h = entity.getFrame().h * entity.getScale().y;
-    
+
     destination.x = x;
     destination.y = y;
     destination.w = w;
     destination.h = h;
-    
+
     SDL_Point rotationCenter = {5, 100};
-    
+
     SDL_RenderCopyEx(renderer, entity.getTexture(), NULL, &destination, entity.getAngle(), &rotationCenter, SDL_FLIP_NONE);
 }
 
-void renderLevelText(int lvl, int currentStrokes, int currentBounces) {
+void renderLevelText(int lvl, int currentStrokes, int currentBounces)
+{
     string level = to_string(lvl);
     string stringTxt = "LEVEL " + level;
-    
-    const char* text = stringTxt.c_str();
-    renderText(36, text, renderer, 20, 12);
+
+    const char *text = stringTxt.c_str();
+    renderText(36, text, renderer, 10, 10);
     renderRequirements(currentStrokes, currentBounces);
 }
 
-void renderRequirements(int _currentStrokes, int _currentBounces) {
+void renderRequirements(int _currentStrokes, int _currentBounces)
+{
     string strokes = to_string((int)requirements.x);
     string currentStrokes = to_string(_currentStrokes);
     string bounces = to_string((int)requirements.y);
     string currentBounces = to_string(_currentBounces);
-    
+
     string stringTxt = "Strokes: " + currentStrokes + " / " + strokes + "   Bounces: " + currentBounces + " / " + bounces;
-    
-    const char* text = stringTxt.c_str();
-    
-    renderText(28, text, renderer, width - 320, 16);
+
+    const char *text = stringTxt.c_str();
+
+    renderText(28, text, renderer, 10, 36);
+}
+
+void renderReplay()
+{
+    renderTextCenter("Press R to play again", renderer, height / 2 + 30);
+}
+
+void renderLose(int loseContext)
+{
+    const string loseMessage = loseContext == 1 ? "Maximum strokes exceeded" : loseContext == 2 ? "Maximum bounces exceeded"
+                                                                                                : "Touched spike";
+    renderTextCenter(loseMessage.c_str(), renderer, height / 2);
+}
+
+void renderStartScreen() {
+    renderTextCenter("Dungeon Golf", renderer, height / 2 - 100, true);
+    renderTextCenter("Press ENTER to start", renderer, height / 2);
 }
