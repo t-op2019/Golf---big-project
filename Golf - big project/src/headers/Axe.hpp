@@ -9,18 +9,21 @@
 
 #include "Entity.hpp"
 
-class Axe : public Entity {
+class Axe : public Entity
+{
 public:
-    Axe(Vector _pos, SDL_Texture* _texture, double _initialAngle, double _rotationRate);
+    Axe(Vector _pos, SDL_Texture *_texture, double _initialAngle, double _rotationRate);
     double getInitialAngle();
     void setInitialAngle(double _initialAngle);
     void update(double delta, bool mouseDown);
-    SDL_Rect* getRect();
+    SDL_Rect *getRect();
     void setOrigin(Vector _pos);
     void setEndpoint(Vector _pos);
     Vector getOrigin();
     Vector getEndpoint();
     double getRotationRate();
+    void setRotationRate(double _rotationRate);
+
 private:
     double initialAngle;
     double rotationRate;

@@ -135,7 +135,7 @@ void Ball::reset()
 }
 
 // function for updating the ball positions when swung, hit walls and hit goals
-void Ball::update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, vector<Axe> axes, Hole hole, int &_gameState, int &_loseContext)
+void Ball::update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, vector<Axe> &axes, Hole hole, int &_gameState, int &_loseContext)
 {
     //    cout << swung << endl;
     if (win)
@@ -180,14 +180,16 @@ void Ball::update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool i
     // boundary check (if the ball hits the boundary, change the direction of the velocity vector) ---------------
     if (getPos().x + getFrame().w > 800)
     {
-        if (_gameState != 0) bounce++;
+        if (_gameState != 0)
+            bounce++;
         setVelocity(-abs(getVelocity().x), getVelocity().y);
         setArrowVelocity(-abs(getArrowVelocity().x), getArrowVelocity().y);
         directionX = -1;
     }
     else if (getPos().x < 0)
     {
-        if (_gameState != 0) bounce++;
+        if (_gameState != 0)
+            bounce++;
         //        cout << directionX << endl;
         setVelocity(abs(getVelocity().x), getVelocity().y);
         setArrowVelocity(abs(getArrowVelocity().x), getArrowVelocity().y);
@@ -195,14 +197,16 @@ void Ball::update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool i
     }
     else if (getPos().y + getFrame().h > 600)
     {
-        if (_gameState != 0) bounce++;
+        if (_gameState != 0)
+            bounce++;
         setVelocity(getVelocity().x, -abs(getVelocity().y));
         setArrowVelocity(getArrowVelocity().x, -abs(getArrowVelocity().y));
         directionY = -1;
     }
     else if (getPos().y < 0)
     {
-        if (_gameState != 0) bounce++;
+        if (_gameState != 0)
+            bounce++;
         setVelocity(getVelocity().x, abs(getVelocity().y));
         setArrowVelocity(getArrowVelocity().x, abs(getArrowVelocity().y));
         directionY = 1;
@@ -212,29 +216,24 @@ void Ball::update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool i
     double newCoordinateX = getPos().x;
     double newCoordinateY = getPos().y;
 
-    //    SDL_Point newPointTopLeft = {(int)newCoordinateX, (int)newCoordinateY};
-    //    SDL_Point newPointBottomRight = {(int)(newCoordinateX + 16), (int)(newCoordinateY + 16)};
-
     // check for axe collision ------------------------------------------------------------------------------------
     for (Axe &axe : axes)
     {
+        axe.setRotationRate(velocityValue);
         Vector axeOrigin = axe.getOrigin();
         Vector axeEndpoint = axe.getEndpoint();
-        double ballAndOriginAngleLeft = SDL_atan2((newCoordinateY - axeOrigin.y), (newCoordinateX - axeOrigin.x)) / M_PI * 180;
-        double ballAndOriginAngleRight = SDL_atan2((newCoordinateY + 16 - axeOrigin.y), (newCoordinateX + 16 - axeOrigin.x)) / M_PI * 180;
         double ballAndOriginAngle = SDL_atan2((newCoordinateY + 8 - axeOrigin.y), (newCoordinateX + 8 - axeOrigin.x)) / M_PI * 180;
-        double axeAngle = SDL_atan((axeEndpoint.y - axeOrigin.y) / (axeEndpoint.x - axeOrigin.x)) / M_PI * 180;
+        double axeAngle = SDL_atan2((axeEndpoint.y - axeOrigin.y), (axeEndpoint.x - axeOrigin.x)) / M_PI * 180;
 
-        double radiusLeft = sqrt(pow(newCoordinateX - axeOrigin.x, 2) + pow(newCoordinateY - axeOrigin.y, 2));
-        double radiusRight = sqrt(pow(newCoordinateX + 16 - axeOrigin.x, 2) + pow(newCoordinateY + 16 - axeOrigin.y, 2));
         double distance = sqrt(pow(newCoordinateX + 8 - axeOrigin.x, 2) + pow(newCoordinateY + 8 - axeOrigin.y, 2));
 
-        bool ballInRadius = distance <= 100;
+        bool ballInRadius = distance < 92;
 
-        if (abs(ballAndOriginAngle - axeAngle) <= 1 && ballInRadius)
+        if (abs(ballAndOriginAngle - axeAngle) <= 4 && ballInRadius && _gameState != 0)
         {
             reset();
             _gameState = 3;
+            _loseContext = 3;
         }
     }
 
@@ -247,7 +246,7 @@ void Ball::update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool i
         bool hitY = false;
 
         // check if the ball hit the vertical edge of the wall
-        if (newCoordinateX + 16 > tile.getPos().x && newCoordinateX < tile.getPos().x + tile.getFrame().w && getPos().y + 16 > tile.getPos().y && getPos().y < tile.getPos().y + tile.getFrame().h - 2)
+        if (newCoordinateX + 16 > tile.getPos().x && newCoordinateX < tile.getPos().x + tile.getFrame().w && getPos().y + 16 > tile.getPos().y && getPos().y < tile.getPos().y + tile.getFrame().h - 3)
         {
             // if the wall is spiked, then reset the level
             if (tile.getIsSpike())
@@ -267,7 +266,8 @@ void Ball::update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool i
             }
             else
             {
-                if (_gameState != 0) bounce++;
+                if (_gameState != 0)
+                    bounce++;
                 // setPos(directionX == 1 ? tile.getPos().x - 16 : tile.getPos().x + 64, newCoordinateY);
                 setVelocity(getVelocity().x * -1, getVelocity().y);
                 setArrowVelocity(getArrowVelocity().x * -1, getArrowVelocity().y);
@@ -277,7 +277,7 @@ void Ball::update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool i
             hitX = true;
         }
         // check if the ball hit the horizontal edge of the wall
-        if (getPos().x + 16 > tile.getPos().x && getPos().x < tile.getPos().x + tile.getFrame().w && newCoordinateY + 16 > tile.getPos().y && newCoordinateY < tile.getPos().y + tile.getFrame().h - 2)
+        if (getPos().x + 16 > tile.getPos().x && getPos().x < tile.getPos().x + tile.getFrame().w && newCoordinateY + 16 > tile.getPos().y && newCoordinateY < tile.getPos().y + tile.getFrame().h - 3)
         {
             if (tile.getIsSpike())
             {
@@ -349,7 +349,7 @@ void Ball::update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool i
         double currentVelocityValue = sqrt(currentXVelocity * currentXVelocity + currentYVelocity * currentYVelocity);
         double currentAngle = -SDL_atan2(currentYVelocity, currentXVelocity) * (180 / M_PI);
 
-        // limit the total velocity to 10
+        // limit the total velocity to 5
         if (currentVelocityValue <= 5)
         {
             setArrowVelocity(currentXVelocity, currentYVelocity);

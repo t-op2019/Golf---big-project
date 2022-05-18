@@ -28,11 +28,11 @@ int main(int argc, const char **argv)
 
     initSDL(window, renderer, windowTitle, width, height);
 
-    int lvl = -1;
-    int gameState = 0;
+    int lvl = 3;
+    int gameState = 1;
 
     bool wonGame = false;
-    
+
     Vector initialBallPos = Vector(rand() % 785, rand() % 585);
     Vector initialBallVelocity = Vector(sqrt(5) / (double)(rand() % 5 + 1), sqrt(5) / (double)(rand() % 5 + 1));
 
@@ -53,8 +53,8 @@ int main(int argc, const char **argv)
 
 void playGame(int gameState, SDL_Event event)
 {
-//    if (gameState != 0)
-//    {
-        update(isPlaying, event);
-//    }
+    //    if (gameState != 0)
+    //    {
+    update(isPlaying, event);
+    //    }
 }

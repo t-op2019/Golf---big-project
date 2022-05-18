@@ -40,7 +40,7 @@ public:
     void setVelocity(double x, double y);
     void setArrowVelocity(double x, double y);
     void setLauchVelocity(double x, double y);
-    void update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, vector<Axe> axes, Hole hole, int &_gameState, int &_loseContext);
+    void update(SDL_Renderer *renderer, double delta, bool isMouseDown, bool isMousePressed, vector<Tile> tiles, vector<Spike> spikes, vector<Axe> &axes, Hole hole, int &_gameState, int &_loseContext);
     void reset();
 
 private:
